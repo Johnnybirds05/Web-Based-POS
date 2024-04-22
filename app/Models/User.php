@@ -17,10 +17,16 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+    protected $table = 'users';
+    protected $primaryKey = 'user_id';
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'first_name',
+        'middle_initial',
+        'last_name',
+        'role',
+        'contact',
+        'username',
+        'password'
     ];
 
     /**
@@ -39,7 +45,16 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function transaction(){
+        return $this->hasMany(Transaction::class,'user_id','user_id');
+    }
+    public function change_cost(){
+        return $this->hasMany(ChangeCost::class,'user_id','user_id');
+    }
+    public function change_quantity(){
+        return $this->hasMany(ChangeQuantity::class,'user_id','user_id');
+    }
 }

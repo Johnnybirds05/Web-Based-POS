@@ -8,8 +8,10 @@ import * as directives from "vuetify/directives";
 const customTheme = {
     dark: false,
     colors: {
-        primary: "#673AB7",
-        secondary: "#424242",
+        primary: "#FEFF86",
+        secondary: "#B0DAFF",
+        third: "#B9E9FC",
+        fourth: "#DAF5FF",
         accent: "#82B1FF",
         error: "#FF5252",
         info: "#2196F3",
@@ -42,7 +44,7 @@ const vuetify = createVuetify({
     theme: {
         defaultTheme: "customTheme",
         themes: {
-            customeTheme,
+            customTheme,
         },
     },
 });

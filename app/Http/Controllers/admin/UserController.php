@@ -1,34 +1,45 @@
 <?php
 
 namespace App\Http\Controllers\admin;
-
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function store(Request $req)
     {
-        //
-    }
+        // return $req;
+        $req->validate([
+            'image' => ['required', 'mimes:jpeg,jpg,png'],
+            'username' =>['required','string','unique:users,username'],
+            'last_name' => ['required','string'],
+            'first_name' => ['required','string'],
+            'role' => ['required','string'],
+            'password' => [ 'required','string','min:8'],
+            'contact' => ['required', 'string', 'regex:/^(\+63|0)9\d{9}$/'],
+        ]);
+        $file = $req->file('image');
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        if($file){
+            $filePath = $file->store('public/avatars');
+            $filePathArray = explode('/', $filePath);
+            $file_location = $filePathArray[2];
+        }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+        User::create([
+            'img' => $file_location,
+            'username' => $req->username,
+            'first_name' => $req->first_name,
+            'last_name' => $req->last_name,
+            'middle_initial' => $req->mname?$req->middle_name:'',
+            'password' => $req->password,
+            'contact' => $req->contact,
+            'role' => $req->role,
+        ]);
+        return response()->json([
+            "status" => 'user successfully saved!'
+        ],200);
     }
 
     /**
@@ -61,5 +72,10 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function index()
+    {
+        return User::all();
     }
 }

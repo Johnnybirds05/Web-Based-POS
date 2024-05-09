@@ -1,7 +1,7 @@
 import "./bootstrap";
 import { createApp } from 'vue/dist/vue.esm-bundler.js';
 import vuetify from "./vuetify";
-
+import axios from 'axios';
 
 
 

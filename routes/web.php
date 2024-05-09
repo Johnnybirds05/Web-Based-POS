@@ -13,6 +13,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('login');
+Route::get('/', function () { return view('auth.login');})->name('login');
+
+Route::post('/login',[App\Http\Controllers\auth\LoginController::class,'login']);
+Route::get('/logout',[App\Http\Controllers\auth\LoginController::class,'logout']);
+
+Route::middleware(['auth'])->group(function(){
+
+    Route::get('/dashboard', function () {
+        return view('dashboard.dashboard');
+    });
+    Route::get('/user',[App\Http\Controllers\admin\AdminDashboard::class,'fetchCurrentUser']);
+});
+
+Route::middleware(['auth','role:ADMIN'])->group(function(){
+    Route::resource('/users', App\Http\Controllers\admin\UserController::class);
+});

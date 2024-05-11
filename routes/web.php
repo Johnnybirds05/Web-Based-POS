@@ -28,4 +28,6 @@ Route::middleware(['auth'])->group(function(){
 
 Route::middleware(['auth','role:ADMIN'])->group(function(){
     Route::resource('/users', App\Http\Controllers\admin\UserController::class);
+    Route::post('/user-update', [App\Http\Controllers\admin\UserController::class,'update']);
+
 });

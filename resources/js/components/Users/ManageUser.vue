@@ -14,16 +14,36 @@
     <template v-slot:default="{ items }">
       <v-row class="pa-4">
         <v-col v-for="(item, i) in items" :key="i" cols="12" sm="6" md="4" lg="4">
-          <v-sheet border class=" rounded-xl border-sm border-surface pa-10 ma-3" elevation="4">
-          <v-row class="d-flex justify-center my-4">
+          <v-sheet border class=" rounded-xl border-sm border-surface pa-7 ma-3" elevation="4" >
+          <v-row class="d-flex justify-center">
             <v-avatar :image="`/storage/avatars/`+item.raw.img" size="200" class="border-lg" color="light-blue"><v-icon
                 icon="mdi-account-circle"></v-icon>
             </v-avatar>
           </v-row>
+          <v-row class="d-flex justify-center my-4">
+              <v-btn icon color="red" @click="popDelete(item.raw.user_id)" class="mr-2">
+                <v-tooltip activator="parent" location="top" >
+                  Delete Profile
+                </v-tooltip>
+                <v-icon>mdi-trash-can</v-icon>
+              </v-btn>
+              <v-btn  icon color="success" @click="getProfile(item.raw.user_id)">
+                  <v-tooltip activator="parent" location="top">
+                    Update Profile
+                  </v-tooltip>
+                  <v-icon>mdi-pen</v-icon>
+              </v-btn> 
+              <v-btn  icon color="muted" @click="getProfile(item.raw.user_id)" class="ml-2">
+                  <v-tooltip activator="parent" location="top">
+                    Change Password
+                  </v-tooltip>
+                  <v-icon>mdi-lock-reset</v-icon>
+              </v-btn> 
+            </v-row>
             <v-list-item :title="item.raw.lname" density="comfortable">
               <template v-slot:title>
                 <strong>
-                  <h4>{{ item.raw.last_name }}, {{ item.raw.first_name }} {{ item.raw.middle_initial }}</h4>
+                  <h5>{{ item.raw.last_name }}, {{ item.raw.first_name }} {{ item.raw.middle_initial }}</h5>
                 </strong>
               </template>
             </v-list-item>
@@ -44,15 +64,8 @@
 
                 <tr align="right">
                   <th>Username:</th>
-
+ 
                   <td>{{ item.raw.username }}</td>
-                </tr>
-                <tr align="right">
-                  <th>Actions:</th>
-
-                  <v-btn icon="mdi-trash-can" variant="text" color="red" @click="popDelete(item.raw.user_id)">
-                  </v-btn> <v-btn icon="mdi-pen" variant="text" color="success"
-                    @click="editDriver(item.raw.user_id)"></v-btn>
                 </tr>
               </tbody>
             </v-table>
@@ -79,7 +92,7 @@
           No Data Found!
       </v-sheet>
   <v-dialog v-model="userForm" max-width="800" persistent>
-    <v-card prepend-icon="mdi-account" title="User Profile" theme="light">
+    <v-card prepend-icon="mdi-account" title="User Profile" theme="light" class="rounded-xl">
       <v-sheet color="light-blue-lighten-4" class="pa-5">
         <v-row class="d-flex justify-center">
           <v-col cols="12" md="4" class="ma-4">
@@ -91,7 +104,7 @@
         <v-row dense>
           <v-col cols="12" md="6" sm="6">
             <v-file-input label="Image" variant="solo" v-model="fields.img" append-icon="mdi-camera" accept="image/*"
-              v-on:change="onChange" theme="dark"  :error-messages="err.image ? err.image[0] : ''"></v-file-input>
+            @change="onChange" theme="dark"  :error-messages="err.image ? err.image[0] : ''"></v-file-input>
           </v-col>
           <v-col cols="12" md="3">
             <v-select
@@ -122,7 +135,7 @@
           <v-col cols="12" md="4" sm="6">
             <v-text-field label="Username" prepend-inner-icon="mdi-account" variant="solo" v-model="fields.username" :rules="[rules.required]"  :error-messages="err.username ? err.username[0] : ''"></v-text-field>
           </v-col>
-          <v-col cols="12" md="4" sm="6">
+          <v-col cols="12" md="4" sm="6" v-if="!fields.user_id">
             <v-text-field label="Password" variant="solo" v-model="fields.password" :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'" :rules="[rules.required,rules.min]"
               :type="visible ? 'text' : 'password'" prepend-inner-icon="mdi-lock-outline"
               @click:append-inner="visible = !visible"
@@ -135,14 +148,15 @@
 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn text="Close" variant="elevated" @click="userForm = false" color="green-darken-2" class="px-5"></v-btn>
-        <v-btn color="blue" text="Save" variant="elevated" @click="saveProfile()"  class="px-5"></v-btn>
+        <v-btn text="Close" variant="elevated" @click="closeForm()" color="green-darken-2" class="px-5"></v-btn>
+        <v-btn color="blue" text="Save" variant="elevated" @click="saveProfile()"  class="px-5" v-if="!fields.user_id"></v-btn>
+        <v-btn color="orange" text="update" variant="elevated" @click="updateProfile()"  class="px-5" v-if="fields.user_id"></v-btn>
         <v-spacer></v-spacer>
       </v-card-actions>
     </v-card>
   </v-dialog>
   <v-snackbar
-      v-model="successDialog"
+      v-model="failedDialog"
       :timeout="2000"
     >
       {{ response }}
@@ -157,6 +171,32 @@
         </v-btn>
       </template>
     </v-snackbar>
+
+    <v-dialog
+      v-model="deleteDialog"
+      max-width="400"
+      persistent
+    >
+
+      <v-card
+        prepend-icon="mdi-alert"
+        text="Are you sure you want to delete this profile?"
+        title="Confirm Delete"
+        class="rounded-xl"
+      >
+        <template v-slot:actions>
+          <v-spacer></v-spacer>
+
+          <v-btn @click="deleteDialog = false">
+            Disagree
+          </v-btn>
+
+          <v-btn @click="deleteDialog = false">
+            Agree
+          </v-btn>
+        </template>
+      </v-card>
+    </v-dialog>
 
 </template>
 <script>
@@ -174,16 +214,21 @@ export default {
       userImagePath: null,
       visible: false,
       err: [],
-      fields: [],
+      fields: {
+        img: [],
+      },
       response: '',
       successDialog:false,
       failedDialog:false,
+      deleteDialog: false,
+      id: ''
     }
   },
   methods: {
     onChange(e) {
       this.userImage = e.target.files[0];
-      this.previewImage()
+      this.fields.img = [this.userImage]; // Update fields.img
+      this.previewImage();
     },
     previewImage() {
       const file = this.userImage;
@@ -215,6 +260,8 @@ export default {
         res=>{
           this.userForm = false;
           this.successDialog = true;
+          this.closeForm()
+          this.loadProfiles()
         }
       ).catch(
         err=>{
@@ -223,12 +270,77 @@ export default {
       )
 
     },
+    getProfile(id){
+      axios.get('/users/'+id+'/edit').then(
+        res=>{
+          this.fields.fname = res.data.first_name
+          this.fields.mname = res.data.middle_initial?res.data.middle_initial:''
+          this.fields.lname = res.data.last_name
+          this.userImagePath =`/storage/avatars/`+res.data.img
+          this.fields.role = res.data.role
+          this.fields.username = res.data.username
+          this.fields.user_id = res.data.user_id
+          this.fields.contact = res.data.contact
+          this.fields.img = "";
+          this.userForm = true
+          this.previewImage()
+        }
+      ).catch(
+        err=>{
+          console.log(err.errors.response.data.errors)
+        }
+      )
+    },
+    updateProfile(){
+       console.log(this.fields)
+        let formData = new FormData();
+        if (this.userImage) {
+          formData.append('image', this.userImage);
+        }
+        formData.append('user_id', this.fields.user_id);
+        formData.append('username', this.fields.username);
+        formData.append('role', this.fields.role);
+        formData.append('first_name', this.fields.fname);
+        formData.append('middle_name', this.fields.mname);
+        formData.append('last_name', this.fields.lname);
+        formData.append('contact', this.fields.contact);
+        formData.append('password', this.fields.password);
+
+        axios.post('/user-update', formData)
+          .then(response => {
+            this.userForm = false;
+            this.successDialog = true;
+            this.closeForm();
+            this.loadProfiles();
+          })
+          .catch(error => {
+            this.err = error.response.data.errors;
+          });
+},
     loadProfiles(){
       axios.get('/users').then(
         res=>{
           this.users = res.data
         }
       )
+    },
+    popDelete(id){
+      this.deleteDialog = true
+      this.id = id
+    },
+    closeForm(){
+      this.userForm = false
+      this.fields={
+        user_id:'',
+        fname:'',
+        lname:'',
+        mname:'',
+        password:'',
+        contact:'',
+        username:''
+      }
+      this.userImage = null
+      this.userImagePath = null
     },
     initData(){
       this.loadProfiles();

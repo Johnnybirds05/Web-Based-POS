@@ -8,7 +8,7 @@
             <v-card-item class="mt-5">
               <v-row>
                 <v-col class="d-flex justify-center align-center my-7">
-                  <v-avatar color="light-blue" size="80" icon="mdi-account-circle">
+                  <v-avatar color="cyan-lighten-2" size="80" icon="mdi-account-circle">
                   </v-avatar>
                 </v-col>
               </v-row>
@@ -23,7 +23,7 @@
                 @click:append-inner="visible = !visible" :error-messages="err.password ? err.password[0] : ''"
                 required></v-text-field>
               <v-row class="px-10 ma-2">
-                  <v-btn block :loading="loading" class="ma-3" color="blue" size="large" type="submit">
+                  <v-btn block :loading="loading" class="ma-3" color="cyan-lighten-2" size="large" type="submit">
                   Log In
                 </v-btn>
               </v-row>
@@ -111,7 +111,7 @@ export default {
 }
 
 .gradient-card {
-  background: linear-gradient(to right, #0a7bf5, #74d6fc);
+  background: linear-gradient(to right, #01b9bc, #74d6fc);
   /* You can adjust the gradient colors and direction as per your design */
   /* Additional styling for the card */
 }

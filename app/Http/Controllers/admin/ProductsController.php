@@ -108,4 +108,14 @@ class ProductsController extends Controller
             'status' => 'Products Successfully Deleted!'
         ]);
     }
+
+    public function destroyMultiple(Request $request)
+    {
+        foreach ($request->all() as $key => $id) {
+            Product::destroy($id);
+        }
+        return response()->json([
+            'status' => 'Multiple Products Successfully Deleted!'
+        ]);
+    }
 }

@@ -129,6 +129,31 @@
         </template>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="deleteDialog" width="auto">
+      <v-card max-width="400" append-icon="mdi-update" title="Multiple Delete">
+        <template v-slot:text>
+        Are You sure you want to delete all selected products?
+        </template>
+        <template v-slot:actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            class="ms-auto"
+            text="Close"
+            @click="deleteDialog = false"
+            variant="elevated"
+            color="green-darken-1"
+          ></v-btn>
+          <v-btn
+            class="ma-4"
+            text="Confirm"
+            variant="elevated"
+            color="light-blue-darken-2"
+            @click="deleteMultiple()"
+          ></v-btn>
+          <v-spacer></v-spacer>
+        </template>
+      </v-card>
+    </v-dialog>
 </template>
 <script>
 export default {
@@ -148,6 +173,7 @@ export default {
       productForm: false,
       failedDialog: false,
       successDialog: false,
+      deleteDialog: false,
       confirmDelete: false,
       headers: [
         {
@@ -209,6 +235,7 @@ export default {
       axios.post("/products", this.fields).then((res) => {
         this.productForm = false;
         this.loadProducts();
+        this.response = res.data
         this.successDialog = true
         this.err = []
       }).catch(
@@ -254,6 +281,16 @@ export default {
           this.err = err.response.data.errors
         }
       );
+    },
+    deleteMultiple(){
+      axios.post('/delete-products',this.selected).then(
+        res=>{
+          this.response = res.data.status
+          this.successDialog = true
+          this.deleteDialog = false
+          this.loadProducts()
+        }
+      )
     }
   },
   mounted() {

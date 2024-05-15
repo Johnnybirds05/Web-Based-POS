@@ -21,9 +21,9 @@ return new class extends Migration
             $table->foreign('user_id')->references('user_id')->on('users')
             ->onDelete('cascade')->onUpdate('cascade');
 
-            $table->float('alter_original_price');
-            $table->float('alter_retail_price');
-            $table->string('remarks');
+            $table->float('alter_original_price')->nullable();
+            $table->float('alter_retail_price')->nullable();
+            $table->string('remarks')->nullable();
             $table->timestamps();
         });
     }

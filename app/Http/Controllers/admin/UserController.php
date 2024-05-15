@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -35,7 +36,7 @@ class UserController extends Controller
             'first_name' => $req->first_name,
             'last_name' => $req->last_name,
             'middle_initial' => $req->mname ? $req->middle_name : '',
-            'password' => $req->password,
+            'password' =>Hash::make($req->password),
             'contact' => $req->contact,
             'role' => $req->role,
         ]);
@@ -84,6 +85,9 @@ class UserController extends Controller
 
         // Update user data in the database
         $user = User::findOrFail($req->user_id);
+        if(Storage::exists('public/avatars/' .$user->img)) {
+            Storage::delete('public/avatars/' . $user->img);
+        }
         $user->update([
             'img' => $file_location ?? $user->img, // Use the new image location or existing image path
             'username' => $req->username,
@@ -108,11 +112,36 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        if(Storage::exists('public/avatars/' .$user->img)) {
+            Storage::delete('public/avatars/' . $user->img);
+        }
+
+        User::destroy($id);
+        
+        return response()->json([
+            'status' => 'Account Successfully Deleted'
+        ]);
     }
 
     public function index()
     {
         return User::all();
+    }
+    public function changePassword(Request $req){
+        $req->validate([
+            'password'=> ['required','confirmed'],
+            'id' => ['required', 'integer']
+        ]);
+
+        
+        
+        User::where('user_id',$req->id)->update([
+            'password' => Hash::make($req->password),
+        ]);
+
+        return response()->json([
+            'status' => 'Password Updated'
+        ]);
     }
 }

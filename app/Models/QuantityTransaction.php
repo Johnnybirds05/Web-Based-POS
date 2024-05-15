@@ -5,13 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ChangeQuantity extends Model
+class QuantityTransaction extends Model
 {
     use HasFactory;
-    protected $table = 'change_quantity';
-    protected $primaryKey = 'alter_quantity_id';
+    protected $table = 'quantity_transaction';
+    protected $primaryKey = 'change_quantity_id';
     protected $fillable = [
-        'product_id',
-        'quantity',
+        'user_id',
+        'remarks'
     ];
 }

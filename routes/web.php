@@ -27,7 +27,12 @@ Route::middleware(['auth'])->group(function(){
 });
 
 Route::middleware(['auth','role:ADMIN'])->group(function(){
+    //Manage Users Profile Route
     Route::resource('/users', App\Http\Controllers\admin\UserController::class);
     Route::post('/user-update', [App\Http\Controllers\admin\UserController::class,'update']);
+    Route::post('/change-password', [App\Http\Controllers\admin\UserController::class,'changePassword']);
+
+    //Manage Product information Route
+    Route::resource('/products',App\Http\Controllers\admin\ProductsController::class);
 
 });

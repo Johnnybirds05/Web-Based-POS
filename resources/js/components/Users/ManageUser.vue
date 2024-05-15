@@ -1,7 +1,7 @@
 <template>
   <v-data-iterator :items="users" items-per-page="6" :search="search">
     <template v-slot:header>
-      <v-toolbar class="pa-3 rounded-xl elevation-1" color="light-blue-lighten-3">
+      <v-toolbar class="pa-3 rounded-xl elevation-1" color="cyan-lighten-2">
         <v-btn
           prepend-icon="mdi-plus-circle"
           @click="userForm = true"
@@ -428,9 +428,6 @@ export default {
           this.userForm = true;
           this.previewImage();
         })
-        .catch((err) => {
-          console.log(err.errors.response.data.errors);
-        });
     },
     updateProfile() {
       let formData = new FormData();

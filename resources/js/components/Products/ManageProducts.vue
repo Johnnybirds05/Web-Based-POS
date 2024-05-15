@@ -1,13 +1,13 @@
 <template>
-  <v-data-table v-model="selected" show-select :headers="headers" item-value="user_id" :items="products"
+  <v-data-table v-model="selected" show-select :headers="headers" item-value="product_id" :items="products"
     :search="search" :loading="loading" :header-props="{ 'color': 'primary' }"
     class="rounded-lg elevation-4 border-b-thin border-secondary" striped>
     <template v-slot:top>
-      <v-toolbar color="light-blue-lighten-3" class="rounded-t-lg pa-3">
+      <v-toolbar color="cyan-lighten-2" class="rounded-t-lg pa-3">
         <v-btn color="red" prepend-icon="mdi-trash-can" v-if="selected.length > 0" @click="deleteDialog = true"
           variant="elevated">
           Multi-Delete</v-btn>
-        <v-btn prepend-icon="mdi-plus-circle" @click="productForm = true" elevation="3" color="light-blue"
+        <v-btn prepend-icon="mdi-plus-circle" @click="productForm = true" elevation="3" color="teal-accent-4"
           variant="flat" class="ml-2">
           <b>Add Products</b>
         </v-btn>

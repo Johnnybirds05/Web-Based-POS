@@ -1,5 +1,5 @@
 <template>
-  <v-app id="inspire" class="content">
+  <v-app class="content">
     <v-layout>
       <v-navigation-drawer
         v-model="drawer"
@@ -42,6 +42,11 @@
             @click="tab = 'THREE'"
           ></v-list-item>
           <v-list-item
+            prepend-icon="mdi-truck-delivery"
+            title="Add Stocks"
+            @click="tab = 'FOUR'"
+          ></v-list-item>
+          <v-list-item
             prepend-icon="mdi-logout"
             title="Logout"
             @click="logout = true"
@@ -49,15 +54,15 @@
         </v-list>
       </v-navigation-drawer>
 
-      <v-app-bar :order="order" color="light-blue" height="90">
+      <v-app-bar :order="order" color="cyan-lighten-2" height="90">
         <v-container class="mx-auto d-flex align-center">
           <template v-slot:image>
             <v-img gradient="to top right, rgba(1,1,1,.9), rgba(128,208,199,.9)"></v-img>
           </template>
-          <v-avatar class="me-4" color="light-blue" size="80">
+          <v-avatar class="me-4" color="cyan-lighten-2" size="80">
             <v-img :src="`/images/companylogo.png`" width="80" contain></v-img>
           </v-avatar>
-          <h2>JLU Enterprise Inc.</h2>
+          <h2 class="text-white">JLU Enterprise Inc.</h2>
           <v-spacer></v-spacer>
         </v-container>
       </v-app-bar>
@@ -77,6 +82,11 @@
           <v-window-item value="THREE">
             <v-card color="transparent" class="pa-5" min-height="90vh">
               <manage-products></manage-products>
+            </v-card>
+          </v-window-item>
+          <v-window-item value="FOUR">
+            <v-card color="transparent" class="pa-5" min-height="90vh">
+              <manage-stocks></manage-stocks>
             </v-card>
           </v-window-item>
         </v-window>

@@ -54,5 +54,6 @@ class QuantityChangeController extends Controller
     public function fetchAllProducts()
     {
         return Product::select('product_id','product_name')->get(); 
+        return response()->json();
     }
 }

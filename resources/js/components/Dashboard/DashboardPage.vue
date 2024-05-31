@@ -43,7 +43,7 @@
           ></v-list-item>
           <v-list-item
             prepend-icon="mdi-truck-delivery"
-            title="Add Stocks"
+            title="Manage Stocks"
             @click="tab = 'FOUR'"
           ></v-list-item>
           <v-list-item
@@ -76,17 +76,17 @@
 
           <v-window-item value="TWO">
             <v-card color="transparent" class="pa-5" min-height="90vh">
-              <manage-user></manage-user>
+              <manage-user ref="ManageUser"></manage-user>
             </v-card>
           </v-window-item>
           <v-window-item value="THREE">
             <v-card color="transparent" class="pa-5" min-height="90vh">
-              <manage-products></manage-products>
+              <manage-products ref="ManageProducts"></manage-products>
             </v-card>
           </v-window-item>
           <v-window-item value="FOUR">
             <v-card color="transparent" class="pa-5" min-height="90vh">
-              <manage-stocks></manage-stocks>
+              <manage-stocks ref="ManageStocks"></manage-stocks>
             </v-card>
           </v-window-item>
         </v-window>
@@ -129,12 +129,43 @@ export default {
       logout: false,
     };
   },
+  watch: {
+        tab(newTab, oldTab) {
+            this.initializeComponent(newTab);
+        }
+    },
   methods: {
     fetchCurrentUser() {
       axios.get("/user").then((res) => {
         this.user = res.data;
       });
     },
+    initializeComponent(tab) {
+            switch (tab) {
+                case 'ONE':
+                this.$nextTick(() => {
+                
+                }); 
+                break;
+                case 'TWO':
+                this.$nextTick(() => {
+                this.$refs.ManageUsers.initData();
+                }); 
+                break;
+                case 'THREE':
+                this.$nextTick(() => {
+                this.$refs.ManageProducts.initData();
+                });
+                break;
+                case 'FOUR':
+                this.$nextTick(() => {
+                this.$refs.ManageStocks.initData();
+                }); 
+                break;
+                default:
+                break;
+            }
+            },
     initData() {
       this.fetchCurrentUser();
     },

@@ -31,9 +31,9 @@ return new class extends Migration
             $table->unsignedBigInteger('change_quantity_id');
             $table->foreign('change_quantity_id')->references('change_quantity_id')->on('quantity_transaction')
             ->onDelete('cascade')->onUpdate('cascade');
-            $table->double('error');
+            $table->double('error')->default(0);
 
-            $table->float('quantity');
+            $table->float('quantity')->default(0);
             $table->timestamps();
         });
     }

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,8 +40,12 @@ Route::middleware(['auth','role:ADMIN'])->group(function(){
 
     //Manage Stocks routes
     Route::resource('/quantity',App\Http\Controllers\admin\QuantityChangeController::class);
+    Route::post('/store-quantity', [App\Http\Controllers\admin\QuantityChangeController::class,'store']);
     Route::get('/fetch-products', [App\Http\Controllers\admin\QuantityChangeController::class,'fetchAllProducts']);
 
-    
 
+});
+
+Route::get('/session', function(){
+    return Session::all();
 });

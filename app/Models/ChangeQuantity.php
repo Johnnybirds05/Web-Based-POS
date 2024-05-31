@@ -11,6 +11,7 @@ class ChangeQuantity extends Model
     protected $table = 'change_quantity';
     protected $primaryKey = 'alter_quantity_id';
     protected $fillable = [
+        'change_quantity_id',
         'product_id',
         'quantity',
     ];

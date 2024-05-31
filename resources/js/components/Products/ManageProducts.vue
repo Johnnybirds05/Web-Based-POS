@@ -17,16 +17,16 @@
       </v-toolbar>
     </template>
     <template v-slot:item.total_quantity="{ item }">
-      <v-chip :color="item.total_quantity ? 'green' : 'red'" :text="item.total_quantity ? item.total_quantity : '0'"
-        class="text-uppercase" size="small" label></v-chip>
+      <v-chip :color="item.total_quantity ? 'green' : 'red'"
+        class="text-uppercase" size="small" label>{{ item.total_quantity ? item.total_quantity : '0' }}</v-chip>
     </template>
     <template v-slot:item.current_quantity="{ item }">
       <v-chip :color="item.current_quantity ? 'blue' : 'orange'"
-        :text="item.current_quantity ? item.current_quantity : '0'" class="text-uppercase" size="small" label></v-chip>
+      class="text-uppercase" size="small" label>{{ item.current_quantity ? item.current_quantity : '0' }}</v-chip>
     </template>
     <template v-slot:item.error="{ item }">
-      <v-chip :color="item.current_quantity ? 'red' : 'green'" :text="item.error ? item.error : '0'"
-        class="text-uppercase" size="small" label></v-chip>
+      <v-chip :color="item.error ? 'red' : 'green'" 
+        class="text-uppercase" size="small" label>{{ item.error ? item.error : '0' }}</v-chip>
     </template>
     <template v-slot:item.actions="{ item }">
       <v-btn icon color="red" @click="popDelete(item.product_id)" class="ma-1">
@@ -233,7 +233,7 @@ export default {
     },
     saveProduct() {
       axios.post("/products", this.fields).then((res) => {
-        this.productForm = false;
+        this.closeForm() 
         this.loadProducts();
         this.response = res.data
         this.successDialog = true
@@ -271,9 +271,8 @@ export default {
       axios.put('/products/'+this.fields.product_id,this.fields).then(
         res=>{
           this.response = res.data
-          this.productForm = false
+          this.closeForm() 
           this.successDialog = true
-          this.fields = {}
           this.loadProducts()
         }
       ).catch(

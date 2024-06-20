@@ -22,11 +22,13 @@ return new class extends Migration
             $table->foreign('product_id')->references('product_id')->on('products')
             ->onDelete('cascade')->onUpdate('cascade');
 
+            $table->float('quantity')->default(0);
+            $table->integer('remarks')->default(0);
+
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('user_id')->on('users')
             ->onDelete('cascade')->onUpdate('cascade');
 
-            $table->float('quantity');
             $table->timestamps();
         });
     }

@@ -36,16 +36,17 @@ Route::middleware(['auth','role:ADMIN'])->group(function(){
     //Manage Product information Routes
     Route::resource('/products',App\Http\Controllers\admin\ProductsController::class);
     Route::post('/delete-products', [App\Http\Controllers\admin\ProductsController::class,'destroyMultiple']);
-
+    Route::get('/fetch-users', [App\Http\Controllers\admin\ProductsController::class,'users']);
+    Route::get('/product-user/{id}', [App\Http\Controllers\admin\ProductsController::class,'productsbyUser']);
+    Route::get('/product-user/{id}/{from}/{to}', [App\Http\Controllers\admin\ProductsController::class,'productsbyUserWithRange']);
+    Route::get('/product-range/{from}/{to}', [App\Http\Controllers\admin\ProductsController::class,'productsWithRange']);
 
     //Manage Stocks routes
-    Route::resource('/quantity',App\Http\Controllers\admin\QuantityChangeController::class);
-    Route::post('/store-quantity', [App\Http\Controllers\admin\QuantityChangeController::class,'store']);
-    Route::get('/fetch-products', [App\Http\Controllers\admin\QuantityChangeController::class,'fetchAllProducts']);
+    Route::resource('/transactions',App\Http\Controllers\user\TransactionController::class);
+    Route::post('/transactions/{remarks}', [App\Http\Controllers\user\TransactionController::class,'store']);
+    Route::post('/transactions/{id}/{remarks}', [App\Http\Controllers\user\TransactionController::class,'update']);
+    Route::get('/fetch-products', [App\Http\Controllers\user\TransactionController::class,'fetchAllProducts']);
+    Route::get('/fetch-remarks', [App\Http\Controllers\user\TransactionController::class,'fetchAllRemarks']);
 
 
-});
-
-Route::get('/session', function(){
-    return Session::all();
 });

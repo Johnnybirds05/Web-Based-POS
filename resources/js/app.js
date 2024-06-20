@@ -2,6 +2,8 @@ import "./bootstrap";
 import { createApp } from 'vue/dist/vue.esm-bundler.js';
 import vuetify from "./vuetify";
 import axios from 'axios';
+import VueSweetalert2 from "vue-sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 
 
 
@@ -17,4 +19,4 @@ for (const path in componentContext) {
     app.component(fileName, component);
   };
   
-app.use(vuetify).mount("#app");
+app.use(vuetify,VueSweetalert2).mount("#app");

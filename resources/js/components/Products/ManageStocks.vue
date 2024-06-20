@@ -39,11 +39,11 @@
         <span>{{ convertDate(item.created_at) }}</span>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-btn icon color="red" @click="popDelete(item.change_quantity_id)" class="ma-1">
+        <v-btn icon color="red" @click="popDelete(item.transaction_id)" class="ma-1" size="x-small">
           <v-tooltip activator="parent" location="top"> Delete Product </v-tooltip>
           <v-icon>mdi-trash-can</v-icon>
         </v-btn>
-        <v-btn icon color="success" @click="editQuantity(item.change_quantity_id)" class="ma-1">
+        <v-btn icon color="success" @click="editTransactions(item.transaction_id)" class="ma-1" size="x-small">
           <v-tooltip activator="parent" location="top"> Update Product </v-tooltip>
           <v-icon>mdi-pen</v-icon>
         </v-btn>
@@ -52,9 +52,22 @@
     <v-dialog v-model="transactionForm" max-width="800" persistent>
       <v-card prepend-icon="mdi-playlist-edit" title="Stocks Information" class="rounded-xl">
         <v-sheet color="teal-lighten-2" class="pa-8">
+          <v-row dense>
+              <v-col cols="12" md="5" sm="5">
+                <v-select
+                  v-model="remark"
+                  variant="solo"
+                  :items="remarks"
+                  item-value="id"
+                  item-title="remark"
+                  density="comfortable"
+                  label="Transaction Type"
+                ></v-select>
+              </v-col>
+            </v-row>
           <div v-for="(transaction, ix) in transactions" :key="ix">
             <v-row dense>
-              <v-col cols="12" md="5" sm="5">
+              <v-col cols="12" md="8" sm="8">
                 <v-select
                   v-model="transaction.product_id"
                   variant="solo"
@@ -65,7 +78,7 @@
                   label="Product Name"
                 ></v-select>
               </v-col>
-              <v-col cols="12" md="2" sm="2">
+              <v-col cols="12" md="3" sm="3" v-if="transaction.product_id">
                 <v-text-field
                   label="Total"
                   variant="solo"
@@ -74,29 +87,10 @@
                   density="comfortable"
                 ></v-text-field>
               </v-col>
-              <v-col cols="12" md="2" sm="2">
-                <v-text-field
-                  label="wasted"
-                  variant="solo"
-                  v-model="transaction.error"
-                  :rules="[rules.required]"
-                  density="comfortable"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" md="2" sm="2">
-                <v-text-field
-                  variant="solo"
-                  density="comfortable"
-                  disabled
-                  v-model="transaction.fine"
-                >
-                  Fine: {{ transaction.quantity - transaction.error }}
-                </v-text-field>
-              </v-col>
               <v-col cols="12" md="1">
                 <v-btn icon color="red" @click="removeStock(ix)" class="ma-1">
                   <v-tooltip activator="parent" location="top"> Remove Row </v-tooltip>
-                  <v-icon>mdi-basket-remove</v-icon>
+                  <v-icon>mdi-delete-variant</v-icon>
                 </v-btn>
               </v-col>
             </v-row>
@@ -106,6 +100,7 @@
             variant="elevated"
             @click="addStocks()"
             color="orange-darken-2"
+            prepend-icon="mdi-plus"
             class="px-5 mb-4"
           ></v-btn>
         </v-sheet>
@@ -123,20 +118,45 @@
             color="blue"
             text="Save"
             variant="elevated"
-            @click="saveStocks()"
+            @click="saveTransactions()"
             class="px-5"
-            v-if="id = 0"
+            v-if="id == 0"
           ></v-btn>
           <v-btn
             color="orange"
             text="Update"
             variant="elevated"
-            @click="updateQuantity()"
+            @click="updateTransactions()"
             class="px-5"
-            v-if="id= 1"
+            v-if="id== 1"
           ></v-btn>
           <v-spacer></v-spacer>
         </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="deleteForm" width="auto">
+      <v-card max-width="500" append-icon="mdi-update" title="Delete">
+        <template v-slot:text>
+        Are You sure you want to delete this transaction?
+        </template>
+        <template v-slot:actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            class="ms-auto"
+            text="Close"
+            @click="deleteForm = false"
+            variant="elevated"
+            color="green-darken-1"
+          ></v-btn>
+          <v-btn
+            class="ma-4"
+            text="Confirm"
+            variant="elevated"
+            color="light-blue-darken-2"
+            @click="deleteTransaction()"
+          ></v-btn>
+          <v-spacer></v-spacer>
+        </template>
       </v-card>
     </v-dialog>
     <v-snackbar v-model="successDialog" :timeout="5000" color="blue">
@@ -148,6 +168,8 @@
   </v-container>
 </template>
 <script>
+import axios from 'axios';
+import Swal from 'sweetalert2';
 export default {
   data() {
     return {
@@ -158,17 +180,18 @@ export default {
       err: [],
       data: [],
       headers: [
-        { title: "ID", align: "center", key: "change_quantity_id" },
+        { title: "ID", align: "center", key: "transaction_id" },
         { title: "Time", align: "center", key: "created_at" },
         { title: "Actions", align: "center", key: "actions" },
       ],
       successDialog: false,
+      deleteForm: false,
       products: [],
-      fields: {},
+      remarks: [],
       loading: false,
       search: "",
       response: '',
-      remarks: '',
+      remark: 1,
       transactionForm: false,
       selectedProduct: null,
       rules: {
@@ -178,69 +201,90 @@ export default {
     };
   },
   methods: {
-    loadQuantity() {
+    loadTransactions() {
       this.loading = true;
-      axios.get("/quantity").then(res => {
+      axios.get("/transactions").then(res => {
         this.transactionsList = res.data;
         this.loading = false;
       });
-    },
-    editQuantity(id){
-      axios.get('/quantity/'+id+'/edit').then(
-       res=>{
-        this.id = 1
-        this.transaction_id = id;
-        this.transactions = res.data
-        this.transactionForm = true
-       }
-      )
     },
     getAllProduct() {
       axios.get('/fetch-products')
         .then(res => {
           this.products = res.data;
         })
-        .catch(error => {
-          console.error('Error fetching products:', error);
-        });
+    },
+    getAllRemarks() {
+      axios.get('/fetch-remarks')
+        .then(res => {
+          this.remarks = res.data;
+        })
     },
     addStocks() {
       this.transactions.push({
         product_id: '',
         quantity: '',
-        error: '',
       });
     },
     removeStock(index) {
       this.transactions.splice(index, 1);
     },
-    saveStocks(){
-      axios.post('/quantity',this.transactions).then(
+    saveTransactions(){
+      axios.post('/transactions/'+this.remark,this.transactions).then(
         res=>{
-          this.loadQuantity();
-          this.response = res.data
-          this.successDialog = true;
+          this.loadTransactions();
+          this.response = res.data.status        
+          Swal.fire("Transaction Successfully Saved!", "", "success");
           this.transactionForm = false;
           this.transactions = []
         }
       )
     },
-    updateQuantity(){
-      axios.put('/quantity/'+this.transaction_id, this.transactions).then(
+    editTransactions(id){
+      axios.get('/transactions/'+id+'/edit').then(
+       res=>{
+        this.id = 1
+        this.remark = res.data[0].remarks
+        console.log(this.remark);
+        this.transaction_id = id;
+        this.transactions = res.data
+        this.transactionForm = true
+       }
+      )
+    },
+    popDelete(id){
+      this.transaction_id = id;
+      this.deleteForm = true;
+    },
+    deleteTransaction(){
+      axios.delete('/transactions/'+this.transaction_id).then(
+        res=>{
+          this.response = res.data.status
+          Swal.fire({
+                title: "Deleted!",
+                text: this.response,
+                icon: "success"
+            });
+          this.deleteForm = false;
+          this.loadTransactions();
+        }
+      )
+    },
+    updateTransactions(){
+      axios.post('/transactions/'+this.transaction_id+'/'+ this.remark, this.transactions).then(
         res => {
-
+          this.loadTransactions();
+          this.response = res.data
+          Swal.fire("Transaction Successfully Updated!", "", "success");
+          this.transactionForm = false;
+          this.transactions = []
         }
       )
     },
     closeForm() {
       this.transactionForm = false;
-      this.remarks = '';
       this.transactions = [];
       this.id = 0;
-    },
-    initData() {
-      this.loadQuantity();
-      this.getAllProduct();
     },
     convertDate(time) {
       if (!time) return '';
@@ -255,7 +299,12 @@ export default {
       };
       const humanReadableDate = date.toLocaleString('en-US', options);
       return humanReadableDate;
-    }
+    },
+    initData() {
+      this.loadTransactions();
+      this.getAllProduct();
+      this.getAllRemarks();
+    },
   },
   mounted() {
     this.initData();

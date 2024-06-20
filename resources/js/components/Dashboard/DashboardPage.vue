@@ -5,6 +5,7 @@
         v-model="drawer"
         :rail="rail"
         permanent
+        floating
         @click="rail = false"
         color="white"
         class="navigations"
@@ -55,6 +56,7 @@
       </v-navigation-drawer>
 
       <v-app-bar :order="order" color="cyan-lighten-2" height="90">
+        <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer" color="white"></v-app-bar-nav-icon>
         <v-container class="mx-auto d-flex align-center">
           <template v-slot:image>
             <v-img gradient="to top right, rgba(1,1,1,.9), rgba(128,208,199,.9)"></v-img>
@@ -69,8 +71,8 @@
       <v-main>
         <v-window v-model="tab">
           <v-window-item value="ONE">
-            <v-card class="pa-15" color="transparent" min-height="90vh">
-              {{ user }}
+            <v-card color="transparent" class="pa-5" min-height="90vh">
+              <manage-transactions ref="ManageTransactions"></manage-transactions>
             </v-card>
           </v-window-item>
 
@@ -144,12 +146,12 @@ export default {
             switch (tab) {
                 case 'ONE':
                 this.$nextTick(() => {
-                
+                  this.$refs.ManageTransactions.initData();
                 }); 
                 break;
                 case 'TWO':
                 this.$nextTick(() => {
-                this.$refs.ManageUsers.initData();
+                this.$refs.ManageUser.initData();
                 }); 
                 break;
                 case 'THREE':
@@ -186,7 +188,4 @@ export default {
   background-color: rgb(223, 247, 255);
 }
 
-.navigations {
-  opacity: 0.8;
-}
 </style>

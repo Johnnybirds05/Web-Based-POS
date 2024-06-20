@@ -17,13 +17,10 @@ class Product extends Model
         'original_price',
         'retail_price',
         'quantity_value',
-        'total_quantity',
-        'current_quantity',
-        'error'
     ];
 
-    public function transaction(){
-        return $this->hasMany(Transaction::class,'product_id','product_id');
+    public function transactions(){
+        return $this->hasMany(TransactionDetail::class,'product_id','product_id');
     }
     public function change_quantity(){
         return $this->hasMany(ChangeQuantity::class,'product_id','product_id');

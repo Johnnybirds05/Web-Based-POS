@@ -1,12 +1,12 @@
 <template>
-  <v-data-table v-model="selected" show-select :headers="headers" item-value="product_id" :items="products"
+<v-data-table v-model="selected" show-select :headers="headers" item-value="product_id" :items="products"
     :search="search" :loading="loading" :header-props="{ 'color': 'primary' }"
     class="rounded-lg elevation-4 border-b-thin border-secondary" striped>
     <template v-slot:top>
       <v-toolbar color="cyan-lighten-2" class="rounded-t-lg pa-3">
-        <v-btn color="red" prepend-icon="mdi-trash-can" v-if="selected.length > 0" @click="deleteDialog = true"
-          variant="elevated">
-          Multi-Delete</v-btn>
+        <v-btn color="red" prepend-icon="mdi-trash-can" v-if="selected.length > 0" @click="deleteMultiple()" variant="elevated">
+          Multi-Delete
+        </v-btn>
         <v-btn prepend-icon="mdi-plus-circle" @click="productForm = true" elevation="3" color="teal-accent-4"
           variant="flat" class="ml-2">
           <b>Add Products</b>
@@ -14,31 +14,48 @@
         <v-spacer></v-spacer>
         <v-text-field v-model="search" clearable density="comfortable" hide-details placeholder="Search"
           prepend-inner-icon="mdi-magnify" style="max-width: 400px" variant="solo" class="mr-2"></v-text-field>
+        <v-btn icon color="blue" @click="filterForm = true" class="ma-1" size="large" variant="flat" elevation="4">
+          <v-tooltip activator="parent" location="top"> Filter </v-tooltip>
+          <v-icon>mdi-form-dropdown</v-icon>
+        </v-btn>
       </v-toolbar>
     </template>
     <template v-slot:item.total_quantity="{ item }">
-      <v-chip :color="item.total_quantity ? 'green' : 'red'"
-        class="text-uppercase" size="small" label>{{ item.total_quantity ? item.total_quantity : '0' }}</v-chip>
+      <v-chip :color="(item.transactions.length > 0 && item.transactions[0].total_quantity > 0) ? 'green' : 'red'"
+        class="text-uppercase" size="small" label>{{ (item.transactions.length > 0 && item.transactions[0].total_quantity) ? item.transactions[0].total_quantity : '0' }}</v-chip>
     </template>
     <template v-slot:item.current_quantity="{ item }">
-      <v-chip :color="item.current_quantity ? 'blue' : 'orange'"
-      class="text-uppercase" size="small" label>{{ item.current_quantity ? item.current_quantity : '0' }}</v-chip>
+      <v-chip :color="(item.transactions.length > 0 && item.transactions[0].current_quantity > 0) ? 'blue' : 'orange'"
+      class="text-uppercase" size="small" label>{{ (item.transactions.length > 0 && item.transactions[0].current_quantity) ? item.transactions[0].current_quantity : '0' }}</v-chip>
     </template>
     <template v-slot:item.error="{ item }">
-      <v-chip :color="item.error ? 'red' : 'green'" 
-        class="text-uppercase" size="small" label>{{ item.error ? item.error : '0' }}</v-chip>
+      <v-chip :color="(item.transactions.length > 0 && item.transactions[0].total_wasted > 0) ? 'red' : 'green'"
+        class="text-uppercase" size="small" label>{{ (item.transactions.length > 0 && item.transactions[0].total_wasted) ? item.transactions[0].total_wasted : '0' }}</v-chip>
+    </template>
+    <template v-slot:item.sales="{ item }">
+      <v-chip :color="(item.transactions.length > 0 && (item.transactions[0].total_sales * item.retail_price) < 0) ? 'red' : 'green'"
+        class="text-uppercase" size="small" label>{{ (item.transactions.length > 0 && (item.transactions[0].total_sales * item.retail_price)) ? (item.transactions[0].total_sales * item.retail_price) : '0' }}</v-chip>
+    </template>
+    <template v-slot:item.loss="{ item }">
+      <v-chip :color="(item.transactions.length > 0 && (item.transactions[0].total_wasted * item.original_price) > 0) ? 'red' : 'green'"
+        class="text-uppercase" size="small" label>{{ (item.transactions.length > 0 && (item.transactions[0].total_wasted * item.original_price)) ? (item.transactions[0].total_wasted * item.original_price) : '0' }}</v-chip>
+    </template>
+    <template v-slot:item.revenue="{ item }">
+      <v-chip :color="(item.transactions.length > 0 && ((item.transactions[0].total_sales * item.retail_price) - ((item.transactions[0].total_sales * item.original_price)+(item.transactions[0].total_wasted * item.original_price))) > 0) ? 'green' : 'red'"
+        class="text-uppercase" size="small" label>{{ (item.transactions.length > 0 && ((item.transactions[0].total_sales * item.retail_price) - ((item.transactions[0].total_sales * item.original_price)+(item.transactions[0].total_wasted * item.original_price)))) ? ((item.transactions[0].total_sales * item.retail_price) - ((item.transactions[0].total_sales * item.original_price)+(item.transactions[0].total_wasted * item.original_price))) : '0' }}</v-chip>
     </template>
     <template v-slot:item.actions="{ item }">
-      <v-btn icon color="red" @click="popDelete(item.product_id)" class="ma-1">
+      <v-btn icon color="red" @click="popDelete(item.product_id)" class="ma-1" size="x-small">
         <v-tooltip activator="parent" location="top"> Delete Product </v-tooltip>
         <v-icon>mdi-trash-can</v-icon>
       </v-btn>
-      <v-btn icon color="success" @click="editProduct(item.product_id)" class="ma-1">
+      <v-btn icon color="success" @click="editProduct(item.product_id)" class="ma-1" size="x-small">
         <v-tooltip activator="parent" location="top"> Update Product </v-tooltip>
         <v-icon>mdi-pen</v-icon>
       </v-btn>
     </template>
-  </v-data-table>
+</v-data-table>
+
   <v-dialog v-model="productForm" max-width="800" persistent>
     <v-card prepend-icon="mdi-clipboard-list" title="Product Information" class="rounded-xl">
       <v-sheet color="light-blue-lighten-2" class="pa-8">
@@ -48,7 +65,7 @@
               :error-messages="err.product_name ? err.product_name[0] : ''" density="comfortable"></v-text-field>
           </v-col>
           <v-col cols="12" md="4" sm="6">
-            <v-select variant="solo" :items="['Chicken Parts', 'Dry Goods']" label="Product Category"
+            <v-select variant="solo" :items="['Meat', 'Dry Goods','Tools']" label="Product Category"
               v-model="fields.category" :rules="[rules.required]" :error-messages="err.category ? err.category[0] : ''"
               density="comfortable"></v-select>
           </v-col>
@@ -85,6 +102,70 @@
           v-if="!fields.product_id"></v-btn>
         <v-btn color="orange" text="update" variant="elevated" @click="updateProduct()" class="px-5"
           v-if="fields.product_id"></v-btn>
+        <v-spacer></v-spacer>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog v-model="filterForm" max-width="900" persistent>
+    <v-card prepend-icon="mdi-clipboard-list" title="Filter Product" class="rounded">
+      <v-sheet color="secondary" class="pa-1">
+        <v-row dense>
+          <v-col cols="12" md="6" sm="12">
+            <v-card title="Scope" class="bg-light-blue-darken-1">
+              <v-card-text class="pa-2">
+                <v-select
+                  v-model="filter.scope"
+                  :items="users"
+                  variant="solo"
+                  item-value="user_id"
+                  item-title="username"
+                  density="comfortable"
+                  label="Scope Value"
+                  :rules="[rules.required]"
+                ></v-select>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="12" md="6" sm="12">
+            <v-card title="Period" class="bg-light-blue-darken-1">
+              <v-card-text class="pa-2">
+                <v-row>
+                  <v-col cols="12" md="12" sm="12">
+                    <v-select
+                      v-model="filter.range"
+                      :items="['All','Range']"
+                      variant="solo"
+                      density="comfortable"
+                      label="Product Name"
+                      :rules="[rules.required]"
+                    ></v-select>
+                  </v-col>
+                  <template  v-if="filter.range == 'Range'">
+                    <v-col cols="12" md="6" sm="12">
+                    <v-text-field type="date" v-model="filter.from" variant="solo" color="primary"
+                        label="From" required :rules="[rules.required]">
+                    </v-text-field>
+                  </v-col>
+                  <v-col cols="12" md="6" sm="12">
+                    <v-text-field type="date" v-model="filter.to" variant="solo" color="primary"
+                        label="to" required :rules="[rules.required]" >
+                    </v-text-field>
+                  </v-col>
+                  </template>
+                </v-row>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-sheet>
+
+      <v-divider></v-divider>
+
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn text="Close" variant="elevated" @click="filterForm = false" color="green-darken-2" class="px-5"></v-btn>
+        <v-btn color="blue" text="Go" variant="elevated" @click="filterProducts()" class="px-5"></v-btn>
         <v-spacer></v-spacer>
       </v-card-actions>
     </v-card>
@@ -129,33 +210,10 @@
         </template>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="deleteDialog" width="auto">
-      <v-card max-width="400" append-icon="mdi-update" title="Multiple Delete">
-        <template v-slot:text>
-        Are You sure you want to delete all selected products?
-        </template>
-        <template v-slot:actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            class="ms-auto"
-            text="Close"
-            @click="deleteDialog = false"
-            variant="elevated"
-            color="green-darken-1"
-          ></v-btn>
-          <v-btn
-            class="ma-4"
-            text="Confirm"
-            variant="elevated"
-            color="light-blue-darken-2"
-            @click="deleteMultiple()"
-          ></v-btn>
-          <v-spacer></v-spacer>
-        </template>
-      </v-card>
-    </v-dialog>
 </template>
 <script>
+import axios from 'axios';
+import Swal from 'sweetalert2';
 export default {
   data() {
     return {
@@ -169,12 +227,14 @@ export default {
       err: [],
       loading: false,
       selected: [],
-      products: [],
+      products: [
+      ],
       productForm: false,
       failedDialog: false,
       successDialog: false,
-      deleteDialog: false,
       confirmDelete: false,
+      filterForm: false,
+      filter: [],
       headers: [
         {
           title: "Name",
@@ -192,7 +252,7 @@ export default {
           key: "retail_price",
         },
         {
-          title: "Total Quantity",
+          title: "Overall Quantity",
           align: "center",
           key: "total_quantity",
         },
@@ -207,12 +267,27 @@ export default {
           key: "error",
         },
         {
+          title: "Sales",
+          align: "center",
+          key: "sales",
+        },
+        {
+          title: "Loss",
+          align: "center",
+          key: "loss",
+        },
+        {
+          title: "Revenue",
+          align: "center",
+          key: "revenue",
+        },
+        {
           title: "Actions",
           align: "center",
           key: "actions",
         },
       ],
-      products: [],
+      users: [],
     };
   },
   methods: {
@@ -223,8 +298,17 @@ export default {
         this.loading = false
       });
     },
-    initData() {
-      this.loadProducts();
+    loadUsers(){
+      axios.get('/fetch-users').then(res => {
+      // Start with the default 'All' user
+      this.users = [
+        {
+          user_id: '0',
+          username: 'All'
+        },
+        ...res.data  // Spread the fetched users
+      ];
+    })
     },
     closeForm() {
       this.fields = {};
@@ -233,16 +317,16 @@ export default {
     },
     saveProduct() {
       axios.post("/products", this.fields).then((res) => {
-        this.closeForm() 
+        this.closeForm()
         this.loadProducts();
         this.response = res.data
-        this.successDialog = true
+        Swal.fire("Product Successfully Saved!", "", "success");
         this.err = []
       }).catch(
         err=>{
           this.err = err.response.data.errors
         }
-      );
+      )
     },
     popDelete(id){
       this.id = id
@@ -251,10 +335,14 @@ export default {
     deleteProduct(){
       axios.delete('/products/'+this.id).then(
         res=>{
-          this.response = res.data
+          this.response = res.data.status
           this.confirmDelete = false
           this.loadProducts();
-          this.successDialog = true
+          Swal.fire({
+                title: "Deleted!",
+                text: this.response,
+                icon: "success"
+            });
         }
       )
     },
@@ -272,7 +360,7 @@ export default {
         res=>{
           this.response = res.data
           this.closeForm() 
-          this.successDialog = true
+          Swal.fire("Product Successfully Updated!", "", "success");
           this.loadProducts()
         }
       ).catch(
@@ -282,14 +370,64 @@ export default {
       );
     },
     deleteMultiple(){
-      axios.post('/delete-products',this.selected).then(
-        res=>{
-          this.response = res.data.status
-          this.successDialog = true
-          this.deleteDialog = false
-          this.loadProducts()
+
+      Swal.fire({
+        title: "Are you sure you want to delete these products?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axios.post('/delete-products',this.selected).then(
+            res=>{
+              this.response = res.data.status
+              Swal.fire({
+                title: "Deleted!",
+                text: this.response,
+                icon: "success"
+              });
+              this.loadProducts()
+            }
+          )
         }
-      )
+      });
+    },
+    filterProducts(){
+      this.loading = true
+      this.filterForm = false
+      if(this.filter.scope == 0 && this.filter.range == 'All'){
+        this.loadProducts()
+      }
+      else if(this.filter.scope !== 0 && this.filter.range == 'All'){
+        axios.get('/product-user/'+this.filter.scope).then(
+          res=>{
+            this.products = res.data
+          }
+        )
+      }
+      else if(this.filter.scope !== 0 && this.filter.range == 'Range'){
+        axios.get('/product-user/'+this.filter.scope+'/'+this.filter.from+'/'+this.filter.to).then(
+          res=>{
+            this.products = res.data
+          }
+        )
+      }
+      else if(this.filter.scope== 0 && this.filter.range == 'Range'){
+        axios.get('/product-range/'+this.filter.from+'/'+this.filter.to).then(
+          res=>{
+            this.products = res.data
+          }
+        )
+      }
+      this.loading = false;
+
+    },
+    initData() {
+      this.loadProducts();
+      this.loadUsers();
     }
   },
   mounted() {

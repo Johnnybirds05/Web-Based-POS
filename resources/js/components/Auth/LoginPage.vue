@@ -31,25 +31,13 @@
           </v-card>
           </v-form>
         </v-col>
-        <v-col cols="12" sm="10" md="5">
+        <v-col cols="12" sm="10" md="5" class="test">
           <v-card class="ma-8 pa-10 d-flex justify-center align-center gradient-card" elevation="5" width="450"
             height="600" rounded="lg">
             <img :src="`/images/companylogo.png`" width="400  " class="mr-2" cover />
           </v-card>
         </v-col>
       </v-row>
-
-      <v-dialog v-model="errorDialog" width="auto">
-        <v-card color="secondary">
-          <v-card-text>
-            {{ errors }}
-          </v-card-text>
-          <v-card-actions>
-            <v-btn color="red" class="text-white" block variant="flat" elevation="4"
-              @click="errorDialog = false">Okay!</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
     </v-main>
     <ul class="circles">
       <li></li>
@@ -66,6 +54,7 @@
   </v-app>
 </template>
 <script>
+import Swal from 'sweetalert2';
 export default {
   data() {
     return {
@@ -76,7 +65,6 @@ export default {
       },
       loading: false,
       fields: {},
-      errorDialog: false,
       err: {}
 
     };
@@ -85,6 +73,7 @@ export default {
     submitForm() {
       this.loading =true
       axios.post('/login', this.fields).then(res => {
+        Swal.fire("Login Success!", "", "success");
         this.loading = false
           window.location = '/dashboard';
       }).catch(error => {
@@ -92,7 +81,11 @@ export default {
         this.errors = error.response.data.errors.logs;
         this.err = error.response.data;
         if (error.response.data.errors.logs) {
-          this.errorDialog = true;
+          Swal.fire({
+          icon: "error",
+          title: "Login Failed",
+          text: this.errors,
+        });
         }
 
       })
@@ -115,4 +108,5 @@ export default {
   /* You can adjust the gradient colors and direction as per your design */
   /* Additional styling for the card */
 }
+
 </style>

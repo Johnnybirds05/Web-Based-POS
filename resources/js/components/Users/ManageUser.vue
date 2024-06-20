@@ -44,11 +44,11 @@
               </v-avatar>
             </v-row>
             <v-row class="d-flex justify-center my-4">
-              <v-btn icon color="red" @click="popDelete(item.raw.user_id)" class="mr-2">
+              <v-btn icon color="red" @click="popDelete(item.raw.user_id)" class="mr-2" size="x-small">
                 <v-tooltip activator="parent" location="top"> Delete Profile </v-tooltip>
                 <v-icon>mdi-trash-can</v-icon>
               </v-btn>
-              <v-btn icon color="success" @click="getProfile(item.raw.user_id)">
+              <v-btn icon color="success" @click="getProfile(item.raw.user_id)" size="x-small">
                 <v-tooltip activator="parent" location="top"> Update Profile </v-tooltip>
                 <v-icon>mdi-pen</v-icon>
               </v-btn>
@@ -57,6 +57,7 @@
                 color="muted"
                 @click="popChangePassword(item.raw.user_id)"
                 class="ml-2"
+                size="x-small"
               >
                 <v-tooltip activator="parent" location="top"> Change Password </v-tooltip>
                 <v-icon>mdi-lock-reset</v-icon>
@@ -275,23 +276,6 @@
     </template>
   </v-snackbar>
 
-  <v-dialog v-model="deleteDialog" max-width="400" persistent>
-    <v-card
-      prepend-icon="mdi-alert"
-      text="Are you sure you want to delete this profile?"
-      title="Confirm Delete"
-      class="rounded-xl"
-    >
-      <template v-slot:actions>
-        <v-spacer></v-spacer>
-
-        <v-btn @click="deleteDialog = false"> Disagree </v-btn>
-
-        <v-btn @click="deleteProfile()"> Agree </v-btn>
-      </template>
-    </v-card>
-  </v-dialog>
-
   <v-dialog v-model="changePassword" max-width="300" persistent>
     <v-card
       prepend-icon="mdi-lock"
@@ -341,6 +325,7 @@
   </v-dialog>
 </template>
 <script>
+import Swal from 'sweetalert2';
 export default {
   data() {
     return {
@@ -362,7 +347,6 @@ export default {
       response: "",
       successDialog: false,
       failedDialog: false,
-      deleteDialog: false,
       id: "",
       changePassword: false,
     };
@@ -403,10 +387,10 @@ export default {
         .post("/users", formData)
         .then((res) => {
           this.userForm = false;
-          this.successDialog = true;
           this.response = res.data.status;
           this.closeForm();
           this.loadProfiles();
+          Swal.fire("Profile Successfully Saved!", "", "success");
         })
         .catch((err) => {
           this.err = err.response.data.errors;
@@ -462,8 +446,30 @@ export default {
       });
     },
     popDelete(id) {
-      this.deleteDialog = true;
       this.id = id;
+      Swal.fire({
+        title: "Are you sure you want to delete this account?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axios.delete("/users/" + this.id).then((res) => {
+            this.deleteDialog = false;
+            this.id = "";
+            this.response = res.data.status;
+            Swal.fire({
+                title: "Deleted!",
+                text: this.response,
+                icon: "success"
+              });
+            this.loadProfiles();
+          });
+        }
+      });
     },
     popChangePassword(id) {
       this.changePassword = true;
@@ -481,15 +487,6 @@ export default {
         .catch((error) => {
           this.err = error.response.data.errors;
         });
-    },
-    deleteProfile() {
-      axios.delete("/users/" + this.id).then((res) => {
-        this.deleteDialog = false;
-        this.id = "";
-        this.successDialog = true;
-        this.response = res.data.status;
-        this.loadProfiles();
-      });
     },
     closeForm() {
       this.userForm = false;

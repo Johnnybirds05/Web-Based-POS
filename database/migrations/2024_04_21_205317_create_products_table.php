@@ -19,9 +19,6 @@ return new class extends Migration
             $table->float('original_price')->nullable();
             $table->float('retail_price')->nullable();
             $table->string('quantity_value')->default(0);
-            $table->float('total_quantity')->default(0);
-            $table->float('current_quantity')->default(0);
-            $table->double('error')->default(0);
             $table->timestamps();
         });
     }

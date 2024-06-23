@@ -14,13 +14,19 @@ class RemarkSeeder extends Seeder
     {
         $data = [
                 [
-                    'remark' => 'Stock In'
+                    'remark' => 'Opening'
                 ],
                 [
-                    'remark' => 'Stock Out'
+                    'remark' => 'Sell'
                 ],
                 [
-                    'remark' => 'Wasted'
+                    'remark' => 'Delivery'
+                ],
+                [
+                    'remark' => 'Damage'
+                ],
+                [
+                    'remark' => 'Closing'
                 ],
             ];
 

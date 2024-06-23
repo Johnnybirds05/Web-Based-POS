@@ -3,7 +3,7 @@
     <v-col cols="12" md="8">
       <v-sheet>
         <v-card
-          class="mx-auto pa-3 bg-secondary"
+          class="mx-auto pa-3 bg-light-blue"
           prepend-icon="mdi-view-list"
           width="100%"
         >
@@ -11,7 +11,7 @@
             <span class="font-weight-black">Sell Products:</span>
           </template>
           <v-card-text>
-            <v-sheet class="bg-secondary">
+            <v-sheet class="bg-light-blue">
               <div v-for="(transaction, ix) in transactions" :key="ix" >
                 <v-row dense>
                   <v-col cols="12" md="8" sm="8">
@@ -48,7 +48,7 @@
                 text="Add Fields"
                 variant="elevated"
                 @click="addStocks()"
-                color="orange-darken-2"
+                color="yellow-darken-2"
                 prepend-icon="mdi-plus"
                 class="px-5 mb-4"
               ></v-btn>
@@ -58,7 +58,7 @@
     </v-col>
     <v-col cols="12" md="4">
       <v-sheet>
-        <v-card class="mx-auto pa-3 bg-primary" prepend-icon="mdi-cash" width="100%">
+        <v-card class="mx-auto pa-3 bg-light-blue-darken-2" prepend-icon="mdi-cash" width="100%">
           <template v-slot:title>
             <span class="font-weight-black">Total Price:</span>
           </template>
@@ -66,11 +66,11 @@
           <v-card-text class="bg-surface-light pt-4 d-flex justify-center">
             <h2>{{ formattedTotalPrice }}</h2>&nbsp; php
           </v-card-text>
-          <v-card-action>
-            <v-btn block variant="elevated" color="light-blue" @click="saveTransactions()">
+          <v-card-actions>
+            <v-btn block variant="elevated" color="orange-darken-2" @click="saveTransactions()">
               Save Transaction
             </v-btn>
-          </v-card-action>
+          </v-card-actions>
         </v-card>
       </v-sheet>
     </v-col>
@@ -80,12 +80,13 @@
         :items="products"
         :search="search"
         :loading="loading"
-        :header-props="{ color: 'primary' }"
-        class="rounded-lg elevation-4 border-b-thin border-secondary"
-        striped
+        class="elevation-4  striped-table"
+        fixed-header
       >
         <template v-slot:top>
-          <v-toolbar color="cyan-lighten-2" class="rounded-t-lg pa-3">
+          <v-toolbar color="light-blue-darken-2" class="rounded-t-lg pa-3">
+            <v-spacer></v-spacer>
+            <h2 class="mx-5"><b>List of Products</b></h2>
             <v-spacer></v-spacer>
             <v-text-field
               v-model="search"
@@ -100,27 +101,25 @@
             ></v-text-field>
           </v-toolbar>
         </template>
-        <template v-slot:item.total_quantity="{ item }">
-          <v-chip
-            :color="
-              item.transactions.length > 0 && item.transactions[0].total_quantity > 0
-                ? 'green'
-                : 'red'
-            "
-            class="text-uppercase"
-            size="small"
-            label
-            >{{
-              item.transactions.length > 0 && item.transactions[0].total_quantity
-                ? item.transactions[0].total_quantity
-                : "0"
-            }}</v-chip
-          >
+        <template v-slot:item.product_name="{ item }">
+         <b>{{ item.product_name }}</b>
+      </template>
+      <template v-slot:headers="{ columns }">
+        <tr>
+          <template v-for="column in columns" :key="column.key">
+            <th class=" text-center">
+              <b>{{ column.title.toUpperCase() }}</b>
+            </th>
+          </template>
+        </tr>
+      </template>
+        <template v-slot:item.retail_price="{ item }">
+          {{item.retail_price.toFixed(2) }}
         </template>
         <template v-slot:item.current_quantity="{ item }">
           <v-chip
             :color="
-              item.transactions.length > 0 && item.transactions[0].current_quantity > 0
+              item.transactions.length > 0 && (item.transactions[0].total_quantity-item.transactions[0].total_sales) > 0
                 ? 'blue'
                 : 'orange'
             "
@@ -128,9 +127,9 @@
             size="small"
             label
             >{{
-              item.transactions.length > 0 && item.transactions[0].current_quantity
-                ? item.transactions[0].current_quantity
-                : "0"
+              item.transactions.length > 0 && (item.transactions[0].total_quantity-item.transactions[0].total_sales)
+                ?(item.transactions[0].total_quantity-item.transactions[0].total_sales).toFixed(2) 
+                : "0.00"
             }}</v-chip
           >
         </template>
@@ -146,8 +145,8 @@
             label
             >{{
               item.transactions.length > 0 && item.transactions[0].total_wasted
-                ? item.transactions[0].total_wasted
-                : "0"
+                ? item.transactions[0].total_wasted.toFixed(2) 
+                : "0.00"
             }}</v-chip
           >
         </template>
@@ -180,19 +179,9 @@ export default {
           key: "product_name",
         },
         {
-          title: "Original Price",
-          align: "center",
-          key: "original_price",
-        },
-        {
           title: "Retail Price",
           align: "center",
           key: "retail_price",
-        },
-        {
-          title: "Overall Quantity",
-          align: "center",
-          key: "total_quantity",
         },
         {
           title: "Current Quantity",
@@ -278,3 +267,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+.striped-table{
+ font-size:12px;
+}
+</style>

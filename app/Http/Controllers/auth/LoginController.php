@@ -20,7 +20,6 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             return Auth::user();
-            // return redirect()->intended('dashboard');
         }
         return response()->json([
             'errors' => [

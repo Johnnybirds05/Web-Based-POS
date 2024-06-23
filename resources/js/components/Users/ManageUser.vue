@@ -1,12 +1,12 @@
 <template>
   <v-data-iterator :items="users" items-per-page="6" :search="search">
     <template v-slot:header>
-      <v-toolbar class="pa-3 rounded-xl elevation-1" color="cyan-lighten-2">
+      <v-toolbar class="pa-3 rounded-xl elevation-1" color="light-blue">
         <v-btn
           prepend-icon="mdi-plus-circle"
           @click="userForm = true"
           elevation="3"
-          color="light-blue"
+          color="cyan-darken-2"
           variant="flat"
         >
           <b>Add User</b>
@@ -331,7 +331,7 @@ export default {
     return {
       rules: {
         required: (value) => !!value || "Required.",
-        min: (v) => v.length >= 4 || "Minimum 4 characters",
+        min: (v) => v.length >= 8 || "Minimum 8 characters",
       },
       search: "",
       users: [],

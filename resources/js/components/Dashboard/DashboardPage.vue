@@ -7,7 +7,6 @@
         permanent
         floating
         @click="rail = false"
-        color="white"
         class="navigations"
         elevation="8"
         min-width="60"
@@ -29,7 +28,7 @@
         <v-list density="comfortable" nav>
           <v-list-item
             prepend-icon="mdi-home-city"
-            title="Home"
+            title="Sell Products"
             @click="tab = 'ONE'"
           ></v-list-item>
           <v-list-item
@@ -48,23 +47,29 @@
             @click="tab = 'FOUR'"
           ></v-list-item>
           <v-list-item
+            prepend-icon="mdi-invoice-list"
+            title="Generate Reports"
+            @click="tab = 'FIVE'"
+          ></v-list-item>
+          <v-list-item
             prepend-icon="mdi-logout"
             title="Logout"
             @click="logout = true"
+            class="border-md border-black bg-yellow"
           ></v-list-item>
         </v-list>
       </v-navigation-drawer>
 
-      <v-app-bar :order="order" color="cyan-lighten-2" height="90">
+      <v-app-bar :order="order" color="cyan-darken-2" height="90">
         <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer" color="white"></v-app-bar-nav-icon>
         <v-container class="mx-auto d-flex align-center">
           <template v-slot:image>
             <v-img gradient="to top right, rgba(1,1,1,.9), rgba(128,208,199,.9)"></v-img>
           </template>
-          <v-avatar class="me-4" color="cyan-lighten-2" size="80">
+          <v-avatar class="me-4" color="cyan-darken-2" size="80">
             <v-img :src="`/images/companylogo.png`" width="80" contain></v-img>
           </v-avatar>
-          <h2 class="text-white">JLU Enterprise Inc.</h2>
+          <h2 class="text-white">JLU Enterprises Inc.</h2>
           <v-spacer></v-spacer>
         </v-container>
       </v-app-bar>
@@ -89,6 +94,11 @@
           <v-window-item value="FOUR">
             <v-card color="transparent" class="pa-5" min-height="90vh">
               <manage-stocks ref="ManageStocks"></manage-stocks>
+            </v-card>
+          </v-window-item>
+          <v-window-item value="FIVE">
+            <v-card color="transparent" class="pa-5" min-height="90vh">
+              <generate-report ref="GenerateReport"></generate-report>
             </v-card>
           </v-window-item>
         </v-window>
@@ -124,7 +134,7 @@ export default {
   data() {
     return {
       drawer: true,
-      rail: false,
+      rail: true,
       order: -1,
       tab: null,
       user: {},
@@ -147,12 +157,12 @@ export default {
                 case 'ONE':
                 this.$nextTick(() => {
                   this.$refs.ManageTransactions.initData();
-                }); 
+                });
                 break;
                 case 'TWO':
                 this.$nextTick(() => {
                 this.$refs.ManageUser.initData();
-                }); 
+                });
                 break;
                 case 'THREE':
                 this.$nextTick(() => {
@@ -162,6 +172,11 @@ export default {
                 case 'FOUR':
                 this.$nextTick(() => {
                 this.$refs.ManageStocks.initData();
+                }); 
+                break;
+                case 'FIVE':
+                this.$nextTick(() => {
+                this.$refs.GenerateReport.initData();
                 }); 
                 break;
                 default:
@@ -180,8 +195,7 @@ export default {
 <style scoped>
 .gradient-card {
   background: linear-gradient(to right, #5fdfff, #0d92ff);
-  /* You can adjust the gradient colors and direction as per your design */
-  /* Additional styling for the card */
+
 }
 
 .content {

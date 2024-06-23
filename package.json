@@ -19,6 +19,7 @@
     "dependencies": {
         "@vitejs/plugin-vue": "^5.0.3",
         "babel-plugin-import-glob": "^2.0.0",
+        "exceljs": "^4.4.0",
         "vue": "^3.4.13",
         "vue-sweetalert2": "^5.0.11",
         "vuetify": "^3.4.10"

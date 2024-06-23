@@ -17,6 +17,10 @@ class TransactionController extends Controller
         return Transaction::all();
     }
 
+    public function fetchAllUserTransactions()
+    {
+        return Transaction::where('user_id',Auth::user()->user_id)->get();
+    }
     public function store($remarks ,Request $request)
     {
         $quantity_transactions = Transaction::create([
@@ -53,7 +57,8 @@ class TransactionController extends Controller
 
     public function update(string $id, Request $request, $remarks)
     {
-        TransactionDetail::destroy('transaction_id',$id);
+        TransactionDetail::where('transaction_id', $id)->delete();
+
         foreach($request->all() as $key => $item){
             TransactionDetail::create([
                  'transaction_id' => $id,
@@ -71,7 +76,7 @@ class TransactionController extends Controller
     public function destroy(string $id)
     {
         Transaction::destroy($id);
-        TransactionDetail::destroy('transaction_id',$id);
+        TransactionDetail::where('transaction_id', $id)->delete();
 
         return response()->json([
             'status' => 'Transaction deleted successfully!'

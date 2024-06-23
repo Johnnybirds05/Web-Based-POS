@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
         $admin = [
             [
                 'first_name' => 'JLU',
-                'last_name' => 'Enterprise',
+                'last_name' => 'Enterprises',
                 'img' => 'man.png',
                 'username' => 'admin',
                 'username' => 'admin',

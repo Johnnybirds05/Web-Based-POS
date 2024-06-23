@@ -6,11 +6,11 @@
       :search="search"
       :loading="loading"
       :header-props="{ color: 'primary' }"
-      class="rounded-lg elevation-4 border-b-thin border-secondary"
+      class="rounded-lg elevation-4 border-b-thin border-secondary striped-table"
       striped
     >
       <template v-slot:top>
-        <v-toolbar color="cyan-lighten-2" class="rounded-t-lg pa-3">
+        <v-toolbar color="light-blue" class="rounded-t-lg pa-3">
           <v-btn
             prepend-icon="mdi-plus-circle"
             @click="transactionForm = true"

@@ -65,8 +65,8 @@ export default {
       },
       loading: false,
       fields: {},
-      err: {}
-
+      err: {},
+      user:{}
     };
   },
   methods: {
@@ -74,8 +74,15 @@ export default {
       this.loading =true
       axios.post('/login', this.fields).then(res => {
         Swal.fire("Login Success!", "", "success");
-        this.loading = false
-          window.location = '/dashboard';
+          this.loading = false
+          this.user = res.data
+          if(this.user.role == 'ADMIN'){
+            window.location = '/dashboard';
+          }
+          else{
+            window.location = '/dashboard-user';
+          }
+
       }).catch(error => {
         this.loading = false
         this.errors = error.response.data.errors.logs;

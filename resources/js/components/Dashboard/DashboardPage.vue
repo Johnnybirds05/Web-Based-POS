@@ -33,17 +33,17 @@
           ></v-list-item>
           <v-list-item
             prepend-icon="mdi-account-group"
-            title="Manage Accounts"
+            title="Accounts"
             @click="tab = 'TWO'"
           ></v-list-item>
           <v-list-item
             prepend-icon="mdi-food-drumstick"
-            title="Manage Products"
+            title="Products"
             @click="tab = 'THREE'"
           ></v-list-item>
           <v-list-item
             prepend-icon="mdi-truck-delivery"
-            title="Manage Stocks"
+            title="Stocks"
             @click="tab = 'FOUR'"
           ></v-list-item>
           <v-list-item

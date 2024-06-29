@@ -50,6 +50,7 @@ class ProductsController extends Controller
             'description' => ['nullable', 'string'],
             'original_price' => ['required', 'numeric'],
             'retail_price' => ['required', 'numeric'],
+            'sub_retail_price' => ['required', 'numeric'],
             'quantity_value' => ['required', 'string'],
         ]);
         Product::create(
@@ -59,6 +60,7 @@ class ProductsController extends Controller
                 'description' => $req->description ? $req->description : '',
                 'original_price' => $req->original_price,
                 'retail_price' => $req->retail_price,
+                'sub_retail_price' => $req->sub_retail_price,
                 'quantity_value' => $req->quantity_value,
             ]
         );
@@ -78,6 +80,7 @@ class ProductsController extends Controller
             'description' => ['nullable', 'string'],
             'original_price' => ['required', 'numeric'],
             'retail_price' => ['required', 'numeric'],
+            'sub_retail_price' => ['required', 'numeric'],
             'quantity_value' => ['required', 'string'],
         ]);
         Product::where('product_id', $req->product_id)
@@ -88,6 +91,7 @@ class ProductsController extends Controller
                     'description' => $req->description ? $req->description : '',
                     'original_price' => $req->original_price,
                     'retail_price' => $req->retail_price,
+                    'sub_retail_price' => $req->sub_retail_price,
                     'quantity_value' => $req->quantity_value,
                 ]
             );

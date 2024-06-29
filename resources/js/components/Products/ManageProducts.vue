@@ -90,70 +90,6 @@
         }}</v-chip
       >
     </template>
-    <template v-slot:item.sales="{ item }">
-      <v-chip
-        :color="
-          item.transactions.length > 0 &&
-          item.transactions[0].total_sales * item.retail_price < 0
-            ? 'red'
-            : 'green'
-        "
-        class="text-uppercase"
-        size="small"
-        label
-        >{{
-          item.transactions.length > 0 &&
-          item.transactions[0].total_sales * item.retail_price
-            ? item.transactions[0].total_sales * item.retail_price
-            : "0"
-        }}</v-chip
-      >
-    </template>
-    <template v-slot:item.loss="{ item }">
-      <v-chip
-        :color="
-          item.transactions.length > 0 &&
-          item.transactions[0].total_wasted * item.original_price > 0
-            ? 'red'
-            : 'green'
-        "
-        class="text-uppercase"
-        size="small"
-        label
-        >{{
-          item.transactions.length > 0 &&
-          item.transactions[0].total_wasted * item.original_price
-            ? item.transactions[0].total_wasted * item.original_price
-            : "0"
-        }}</v-chip
-      >
-    </template>
-    <template v-slot:item.revenue="{ item }">
-      <v-chip
-        :color="
-          item.transactions.length > 0 &&
-          item.transactions[0].total_sales * item.retail_price -
-            (item.transactions[0].total_sales * item.original_price +
-              item.transactions[0].total_wasted * item.original_price) >
-            0
-            ? 'green'
-            : 'red'
-        "
-        class="text-uppercase"
-        size="small"
-        label
-        >{{
-          item.transactions.length > 0 &&
-          item.transactions[0].total_sales * item.retail_price -
-            (item.transactions[0].total_sales * item.original_price +
-              item.transactions[0].total_wasted * item.original_price)
-            ? item.transactions[0].total_sales * item.retail_price -
-              (item.transactions[0].total_sales * item.original_price +
-                item.transactions[0].total_wasted * item.original_price)
-            : "0"
-        }}</v-chip
-      >
-    </template>
     <template v-slot:item.actions="{ item }">
       <v-btn
         icon
@@ -225,6 +161,17 @@
               v-model="fields.retail_price"
               :rules="[rules.required]"
               :error-messages="err.retail_price ? err.retail_price[0] : ''"
+              density="comfortable"
+              suffix="Php"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="4" sm="6">
+            <v-text-field
+              label="Substitute Retail Price"
+              variant="solo"
+              v-model="fields.sub_retail_price"
+              :rules="[rules.required]"
+              :error-messages="err.sub_retail_price ? err.sub_retail_price[0] : ''"
               density="comfortable"
               suffix="Php"
             ></v-text-field>
@@ -442,6 +389,11 @@ export default {
           key: "retail_price",
         },
         {
+          title: "Sub-retail Price",
+          align: "center",
+          key: "sub_retail_price",
+        },
+        {
           title: "Current Quantity",
           align: "center",
           key: "current_quantity",
@@ -450,21 +402,6 @@ export default {
           title: "Wasted",
           align: "center",
           key: "error",
-        },
-        {
-          title: "Sales",
-          align: "center",
-          key: "sales",
-        },
-        {
-          title: "Loss",
-          align: "center",
-          key: "loss",
-        },
-        {
-          title: "Revenue",
-          align: "center",
-          key: "revenue",
         },
         {
           title: "Actions",

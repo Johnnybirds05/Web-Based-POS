@@ -15,6 +15,7 @@ class TransactionDetail extends Model
         'product_id',
         'quantity',
         'remarks',
-        'user_id'
+        'user_id',
+        'total_price'
     ];
 }

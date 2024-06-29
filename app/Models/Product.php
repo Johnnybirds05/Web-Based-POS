@@ -16,6 +16,7 @@ class Product extends Model
         'category',
         'original_price',
         'retail_price',
+        'sub_retail_price',
         'quantity_value',
     ];
 

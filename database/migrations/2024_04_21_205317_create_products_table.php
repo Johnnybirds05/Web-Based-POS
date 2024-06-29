@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('category');
             $table->float('original_price')->nullable();
             $table->float('retail_price')->nullable();
+            $table->float('sub_retail_price')->nullable();
             $table->string('quantity_value')->default(0);
             $table->timestamps();
         });

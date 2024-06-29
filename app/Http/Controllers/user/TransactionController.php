@@ -32,7 +32,8 @@ class TransactionController extends Controller
                  'product_id' => $item['product_id'],
                  'quantity' => $item['quantity'],
                  'remarks' => $remarks,
-                 'user_id' => Auth::user()->user_id
+                 'user_id' => Auth::user()->user_id,
+                 'total_price' => $item['price']??0
              ]);
          }
 
@@ -65,7 +66,8 @@ class TransactionController extends Controller
                  'product_id' => $item['product_id'],
                  'quantity' => $item['quantity'],
                  'remarks' => $remarks,
-                 'user_id' => Auth::user()->user_id
+                 'user_id' => Auth::user()->user_id,
+                 'total_price' => $item['price']??0
              ]);
          }
          return response()->json([

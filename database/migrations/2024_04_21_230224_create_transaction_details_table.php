@@ -25,7 +25,7 @@ return new class extends Migration
             $table->float('quantity')->default(0);
             $table->integer('remarks')->default(0);
 
-            $table->float('total_price')->nullable();
+            $table->float('total_price')->default(0);
 
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('user_id')->on('users')

@@ -53,6 +53,10 @@ Route::middleware(['auth','role:ADMIN'])->group(function(){
     Route::get('/fetch-reports-total/{id}', [App\Http\Controllers\admin\ReportsController::class,'generateReportsTotalUser']);
     Route::get('/fetch-reports-date/{date}', [App\Http\Controllers\admin\ReportsController::class,'generateReportsDate']);
     Route::get('/fetch-reports-total-date/{date}', [App\Http\Controllers\admin\ReportsController::class,'generateReportsTotalDate']);
+    Route::get('/fetch-reports-date/{from}/{to}', [App\Http\Controllers\admin\ReportsController::class,'generateReportsDateRange']);
+    Route::get('/fetch-reports-total-date/{from}/{to}', [App\Http\Controllers\admin\ReportsController::class,'generateReportsTotalDateRange']);
+    Route::get('/fetch-reports-date/{id}/{from}/{to}', [App\Http\Controllers\admin\ReportsController::class,'generateReportsDateRangeUser']);
+    Route::get('/fetch-reports-total-date/{id}/{from}/{to}', [App\Http\Controllers\admin\ReportsController::class,'generateReportsTotalDateRangeUser']);
     Route::get('/fetch-reports/{id}/{date}', [App\Http\Controllers\admin\ReportsController::class,'generateReportsUserDate']);
     Route::get('/fetch-reports-total/{id}/{date}', [App\Http\Controllers\admin\ReportsController::class,'generateReportsTotalUserDate']);
 
@@ -73,6 +77,9 @@ Route::middleware(['auth','role:USER'])->group(function(){
 
     Route::get('/fetch-reports-users/{date}', [App\Http\Controllers\admin\ReportsController::class,'generateReportsCurrentUserDate']);
     Route::get('/fetch-reports-total-users/{date}', [App\Http\Controllers\admin\ReportsController::class,'generateReportsTotalCurrentUserDate']);
+
+    Route::get('/fetch-reports-users/{from}/{to}', [App\Http\Controllers\admin\ReportsController::class,'generateReportsDateRangeCurrentUser']);
+    Route::get('/fetch-reports-total-users/{from}/{to}', [App\Http\Controllers\admin\ReportsController::class,'generateReportsTotalDateRangeCurrentUser']);
 
 
 

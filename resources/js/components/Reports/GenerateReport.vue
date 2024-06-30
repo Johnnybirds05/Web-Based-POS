@@ -34,9 +34,19 @@
                     <b>{{ item.category }}</b>
                   </td>
                   <td class="text-center">{{ item.total_sales.toFixed(2)  }}</td>
-                  <td class="text-center">{{ item.total_prices.toFixed(2)  }}</td>
-                  <td class="text-center">{{ item.descrepancy.toFixed(2) }}</td>
-                  <td class="text-center">{{ (item.descrepancy + item.total_prices).toFixed(2)  }}</td>
+                  <td class="text-center">{{ item.total_sales_price.toFixed(2)  }}</td>
+                  <template v-if="item.category === 'CHICKEN'">
+                    <td class="text-center" v-if="item.closing === 0">0.00</td>
+                    <td class="text-center" v-if="item.closing !== 0">{{ (item.descrepancy_kg * products[0].original_price).toFixed(2) }}</td>
+                    <td class="text-center" v-if="item.closing === 0">{{ item.total_sales_price.toFixed(2) }}</td>
+                    <td class="text-center" v-if="item.closing !== 0">{{ ((item.descrepancy_kg * products[0].original_price) + item.total_sales_price).toFixed(2)  }}</td>
+                  </template>
+                  <template v-else>
+                    <td class="text-center" v-if="item.closing === 0">0.00</td>
+                    <td class="text-center" v-if="item.closing !== 0">{{ item.descrepancy.toFixed(2) }}</td>
+                    <td class="text-center" v-if="item.closing === 0">{{ item.total_sales_price.toFixed(2) }}</td>
+                    <td class="text-center" v-if="item.closing !== 0">{{ (item.descrepancy + item.total_sales_price).toFixed(2)  }}</td>
+                  </template>
                 </tr>
                 <tr>
                   <th colspan="5" class="text-center bg-light-blue">
@@ -82,7 +92,7 @@
                       <v-col cols="12" md="12" sm="12">
                         <v-select
                           v-model="filter.range"
-                          :items="['All', 'Select']"
+                          :items="['All', 'Select','Range']"
                           variant="solo"
                           density="compact"
                           label="Range Type"
@@ -98,6 +108,34 @@
                             variant="solo"
                             color="primary"
                             label="Date"
+                            required
+                            :rules="[rules.required]"
+                            @update:modelValue="filterProducts()"
+                          >
+                          </v-text-field>
+                        </v-col>
+                      </template>
+                      <template v-if="filter.range == 'Range'">
+                        <v-col cols="12" md="6" sm="6">
+                          <v-text-field
+                            type="date"
+                            v-model="filter.from"
+                            variant="solo"
+                            color="primary"
+                            label="Date From"
+                            required
+                            :rules="[rules.required]"
+                            @update:modelValue="filterProducts()"
+                          >
+                          </v-text-field>
+                        </v-col>
+                        <v-col cols="12" md="6" sm="6">
+                          <v-text-field
+                            type="date"
+                            v-model="filter.to"
+                            variant="solo"
+                            color="primary"
+                            label="Date To"
                             required
                             :rules="[rules.required]"
                             @update:modelValue="filterProducts()"
@@ -217,8 +255,8 @@
       <template v-slot:item.sales="{ item }">
         {{
           item.transactions.length > 0 &&
-          item.transactions[0].total_sales * item.retail_price
-            ? (item.transactions[0].total_sales * item.retail_price).toFixed(2)
+          item.transactions[0].total_sales_price
+            ? item.transactions[0].total_sales_price.toFixed(2)
             : "0.00"
         }}
       </template>
@@ -267,8 +305,8 @@
       <template v-slot:item.sbs="{ item }">
         {{
           item.transactions.length > 0 &&
-          item.transactions[0].total_quantity - item.transactions[0].total_sales
-            ? (item.transactions[0].total_quantity - item.transactions[0].total_sales).toFixed(2)
+          item.transactions[0].total_quantity - (item.transactions[0].total_sales+item.transactions[0].total_wasted)
+            ? (item.transactions[0].total_quantity -(item.transactions[0].total_sales+item.transactions[0].total_wasted)).toFixed(2)
             : "0.00"
         }}
       </template>
@@ -276,7 +314,7 @@
         {{
           item.transactions.length > 0 && item.transactions[0].closing !== 0
             ? (item.transactions[0].total_quantity -
-              (item.transactions[0].closing + item.transactions[0].total_sales)).toFixed(2)
+              (item.transactions[0].closing + item.transactions[0].total_sales+item.transactions[0].total_wasted)).toFixed(2)
             : "0.00"
         }}
       </template>
@@ -284,7 +322,7 @@
         {{
           item.transactions.length > 0 && item.transactions[0].closing !== 0
             ? ((item.transactions[0].total_quantity -
-                (item.transactions[0].closing + item.transactions[0].total_sales)) *
+                (item.transactions[0].closing + item.transactions[0].total_sales +item.transactions[0].total_wasted)) *
               item.retail_price).toFixed(2)
             : "0.00"
         }}
@@ -293,7 +331,6 @@
         <v-btn
           icon
           color="cyan-darken-4"
-          @click="editProduct(item.product_id)"
           class="ma-1"
           size="x-small"
         >
@@ -460,6 +497,32 @@ export default {
           this.totals = res.data;
         });
       }
+      else if (
+        this.filter.scope == 0 &&
+        this.filter.range == "Range" &&
+        this.filter.to &&
+        this.filter.from
+      ) {
+        axios.get("/fetch-reports-date/" + this.filter.from+'/'+this.filter.to).then((res) => {
+          this.products = res.data;
+        });
+        axios.get("/fetch-reports-total-date/"  + this.filter.from+'/'+this.filter.to).then((res) => {
+          this.totals = res.data;
+        });
+      }
+      else if (
+        this.filter.scope !== 0  &&
+        this.filter.range == "Range" &&
+        this.filter.to &&
+        this.filter.from
+      ) {
+        axios.get("/fetch-reports-date/"+ this.filter.scope + "/" + this.filter.from+'/'+this.filter.to).then((res) => {
+          this.products = res.data;
+        });
+        axios.get("/fetch-reports-total-date/"+ this.filter.scope + "/"  + this.filter.from+'/'+this.filter.to).then((res) => {
+          this.totals = res.data;
+        });
+      }
       this.loading = false;
     },
     async downloadExcel() {
@@ -478,13 +541,23 @@ export default {
 
       // Add rows to the "Totals" sheet
       this.totals.forEach(item => {
-        totalsSheet.addRow({
-          category: item.category,
-          total_sales: item.total_sales.toFixed(2),
-          total_prices: item.total_prices.toFixed(2),
-          descrepancy: item.descrepancy.toFixed(2),
-          total: (item.descrepancy + item.total_prices).toFixed(2)
-        });
+        if (item.category === 'CHICKEN') {
+          totalsSheet.addRow({
+            category: item.category,
+            total_sales: item.total_sales.toFixed(2),
+            total_prices: item.total_sales_price.toFixed(2),
+            descrepancy: item.closing === 0 ? 0.00 : (item.descrepancy_kg * this.products[0].original_price).toFixed(2),
+            total: item.closing === 0 ? item.total_sales_price.toFixed(2) : ((item.descrepancy_kg * this.products[0].original_price) + item.total_sales_price).toFixed(2)
+          });
+        } else {
+          totalsSheet.addRow({
+            category: item.category,
+            total_sales: item.total_sales.toFixed(2),
+            total_prices: item.total_sales_price.toFixed(2),
+            descrepancy: item.closing === 0 ? 0.00 : item.descrepancy.toFixed(2),
+            total: item.closing === 0 ? item.total_sales_price.toFixed(2) : (item.descrepancy + item.total_sales_price).toFixed(2)
+          });
+        }
       });
 
       // Add column headers to the "Products" sheet
@@ -501,7 +574,6 @@ export default {
         { header: 'SHOULD BE SOLD', key: 'sbs' },
         { header: 'KG(DISCREPANCY)', key: 'kg_des' },
         { header: 'DISCREPANCY IN PESO', key: 'des_peso' }
-
       ];
 
       // Add rows to the "Products" sheet
@@ -510,16 +582,15 @@ export default {
           product_name: item.product_name,
           retail_price: item.retail_price.toFixed(2),
           total_sales: item.transactions[0]?.total_sales.toFixed(2) || 0.00,
-          sales: item.transactions[0]?.total_sales * item.retail_price.toFixed(2) || 0.00,
+          sales: item.transactions[0]?.total_sales_price.toFixed(2) || 0.00,
           opening: item.transactions[0]?.opening.toFixed(2) || 0.00,
           delivery: item.transactions[0]?.delivery.toFixed(2) || 0.00,
           total_quantity: item.transactions[0]?.total_quantity.toFixed(2) || 0.00,
           closing: item.transactions[0]?.closing.toFixed(2) || 0.00,
           total_wasted: item.transactions[0]?.total_wasted.toFixed(2) || 0.00,
-          sbs: (item.transactions[0]?.total_quantity - item.transactions[0]?.total_sales).toFixed(2) || 0.00,
-          kg_des: (item.transactions[0]?.total_quantity - (item.transactions[0]?.closing + item.transactions[0]?.total_sales)).toFixed(2) || 0.00,
-          des_peso: ((item.transactions[0]?.total_quantity - (item.transactions[0]?.closing + item.transactions[0]?.total_sales)) * item.retail_price).toFixed(2) || 0.00
-
+          sbs: (item.transactions[0]?.total_quantity - (item.transactions[0]?.total_sales+item.transactions[0]?.total_wasted)).toFixed(2) || 0.00,
+          kg_des: (item.transactions[0]?.closing !== 0 ? (item.transactions[0]?.total_quantity - (item.transactions[0]?.closing + item.transactions[0]?.total_sales +item.transactions[0]?.total_wasted)).toFixed(2) : 0.00),
+          des_peso: (item.transactions[0]?.closing !== 0 ? ((item.transactions[0]?.total_quantity - (item.transactions[0]?.closing + item.transactions[0]?.total_sales +item.transactions[0]?.total_wasted)) * item.retail_price).toFixed(2) : 0.00)
         });
       });
 
@@ -528,9 +599,10 @@ export default {
       const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
       // Create a link element, use it to download the blob, then remove it
+      const now = new Date();
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = 'TablesData.xlsx';
+      link.download = 'Reports -' + now + '.xlsx';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

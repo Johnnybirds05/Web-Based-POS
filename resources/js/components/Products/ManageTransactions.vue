@@ -47,7 +47,7 @@
                       @update:modelValue="calculatePrice(ix)"
                     ></v-select>
                   </v-col>
-                  <v-col cols="12" md="3" sm="3" v-if="transaction.price_type">
+                  <v-col cols="12" md="3" sm="3" v-if="transaction.price_type && transaction.product_id">
                     <v-text-field
                       label="Total Price"
                       variant="solo"
@@ -337,16 +337,7 @@ export default {
   computed: {
     totalPrice() {
       return this.transactions.reduce((total, transaction) => {
-        const product = this.products.find(
-          (prod) => prod.product_id === transaction.product_id
-        );
-
-        if (product) {
-          return total + transaction.quantity * product.retail_price;
-        } else {
-          console.warn(`Product with ID ${transaction.product_id} not found.`);
-          return total;
-        }
+        return total + parseFloat(transaction.price || 0);
       }, 0);
     },
     formattedTotalPrice() {

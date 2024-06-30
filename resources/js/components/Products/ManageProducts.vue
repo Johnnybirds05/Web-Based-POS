@@ -59,7 +59,7 @@
     <template v-slot:item.current_quantity="{ item }">
       <v-chip
         :color="
-          item.transactions.length > 0 && item.transactions[0].total_quantity > 0
+          item.transactions.length > 0 && (item.transactions[0].total_quantity-item.transactions[0].total_sales) > 0
             ? 'blue'
             : 'orange'
         "
@@ -67,9 +67,9 @@
         size="small"
         label
         >{{
-          item.transactions.length > 0 && item.transactions[0].total_quantity
-            ? item.transactions[0].total_quantity
-            : "0"
+          item.transactions.length > 0 && item.transactions[0].total_quantity-item.transactions[0].total_sales
+            ? item.transactions[0].total_quantity-item.transactions[0].total_sales
+            : "0.00"
         }}</v-chip
       >
     </template>
@@ -86,7 +86,24 @@
         >{{
           item.transactions.length > 0 && item.transactions[0].total_wasted
             ? item.transactions[0].total_wasted
-            : "0"
+            : "0.00"
+        }}</v-chip
+      >
+    </template>
+    <template v-slot:item.total_sales="{ item }">
+      <v-chip
+        :color="
+          item.transactions.length > 0 && item.transactions[0].total_sales < 0
+            ? 'red'
+            : 'green'
+        "
+        class="text-uppercase"
+        size="small"
+        label
+        >{{
+          item.transactions.length > 0 && item.transactions[0].total_sales
+            ? item.transactions[0].total_sales
+            : "0.00"
         }}</v-chip
       >
     </template>
@@ -402,6 +419,11 @@ export default {
           title: "Wasted",
           align: "center",
           key: "error",
+        },
+        {
+          title: "Sales",
+          align: "center",
+          key: "total_sales",
         },
         {
           title: "Actions",

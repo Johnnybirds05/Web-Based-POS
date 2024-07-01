@@ -290,23 +290,23 @@
         {{
           item.transactions.length > 0 &&
           item.transactions[0].total_quantity - (item.transactions[0].total_sales+item.transactions[0].total_wasted)
-            ? (item.transactions[0].total_quantity -(item.transactions[0].total_sales+item.transactions[0].total_wasted)).toFixed(2)
+            ? (item.transactions[0].total_quantity -(item.transactions[0].total_sales - item.transactions[0].total_wasted)).toFixed(2)
             : "0.00"
         }}
       </template>
       <template v-slot:item.kg_des="{ item }">
         {{
-          item.transactions.length > 0 && item.transactions[0].closing !== 0
+          item.transactions.length > 0 
             ? (item.transactions[0].total_quantity -
-              (item.transactions[0].closing + item.transactions[0].total_sales+item.transactions[0].total_wasted)).toFixed(2)
+              (item.transactions[0].closing + item.transactions[0].total_sales - item.transactions[0].total_wasted)).toFixed(2)
             : "0.00"
         }}
       </template>
       <template v-slot:item.des_peso="{ item }">
         {{
-          item.transactions.length > 0 && item.transactions[0].closing !== 0
+          item.transactions.length > 0
             ? ((item.transactions[0].total_quantity -
-                (item.transactions[0].closing + item.transactions[0].total_sales +item.transactions[0].total_wasted)) *
+                (item.transactions[0].closing + item.transactions[0].total_sales - item.transactions[0].total_wasted)) *
               item.retail_price).toFixed(2)
             : "0.00"
         }}
@@ -534,15 +534,17 @@ export default {
           total_quantity: item.transactions[0]?.total_quantity.toFixed(2) || 0.00,
           closing: item.transactions[0]?.closing.toFixed(2) || 0.00,
           total_wasted: item.transactions[0]?.total_wasted.toFixed(2) || 0.00,
-          sbs: (item.transactions[0]?.total_quantity - (item.transactions[0]?.total_sales+item.transactions[0]?.total_wasted)).toFixed(2) || 0.00,
-          kg_des: (item.transactions[0]?.closing !== 0 ? (item.transactions[0]?.total_quantity - (item.transactions[0]?.closing + item.transactions[0]?.total_sales +item.transactions[0]?.total_wasted)).toFixed(2) : 0.00),
-          des_peso: (item.transactions[0]?.closing !== 0 ? ((item.transactions[0]?.total_quantity - (item.transactions[0]?.closing + item.transactions[0]?.total_sales +item.transactions[0]?.total_wasted)) * item.retail_price).toFixed(2) : 0.00)
+          sbs: (item.transactions[0]?.total_quantity - (item.transactions[0]?.total_sales-item.transactions[0]?.total_wasted)).toFixed(2) || 0.00,
+          kg_des: (item.transactions[0]?.closing !== 0 ? (item.transactions[0]?.total_quantity - (item.transactions[0]?.closing + item.transactions[0]?.total_sales -item.transactions[0]?.total_wasted)).toFixed(2) : 0.00),
+          des_peso: (item.transactions[0]?.closing !== 0 ? ((item.transactions[0]?.total_quantity - (item.transactions[0]?.closing + item.transactions[0]?.total_sales -item.transactions[0]?.total_wasted)) * item.retail_price).toFixed(2) : 0.00)
         });
       });
 
+      // Write the Excel file and trigger the download
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
+      // Create a link element, use it to download the blob, then remove it
       const now = new Date();
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);

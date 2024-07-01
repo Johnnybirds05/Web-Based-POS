@@ -24,7 +24,8 @@ class TransactionController extends Controller
     public function store($remarks ,Request $request)
     {
         $quantity_transactions = Transaction::create([
-            'user_id' => Auth::user()->user_id
+            'user_id' => Auth::user()->user_id,
+            'remarks' => $remarks
         ]);
         foreach($request->all() as $key => $item){
             TransactionDetail::create([

@@ -35,6 +35,9 @@
           ></v-text-field>
         </v-toolbar>
       </template>
+      <template v-slot:item.remarks="{ item }">
+        <span>{{ remarks.find(remark => remark.id === item.remarks)?.remark || 'No Remark Found' }}</span>
+      </template>
       <template v-slot:item.created_at="{ item }">
         <span>{{ convertDate(item.created_at) }}</span>
       </template>

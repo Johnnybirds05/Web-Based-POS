@@ -35,6 +35,9 @@
           ></v-text-field>
         </v-toolbar>
       </template>
+      <template v-slot:item.remarks="{ item }">
+        <span>{{ remarks.find(remark => remark.id === item.remarks)?.remark || 'No Remark Found' }}</span>
+      </template>
       <template v-slot:item.created_at="{ item }">
         <span>{{ convertDate(item.created_at) }}</span>
       </template>
@@ -181,6 +184,7 @@ export default {
       data: [],
       headers: [
         { title: "ID", align: "center", key: "transaction_id" },
+        { title: "Remarks", align: "center", key: "remarks" },
         { title: "Time", align: "center", key: "created_at" },
         { title: "Actions", align: "center", key: "actions" },
       ],

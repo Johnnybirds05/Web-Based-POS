@@ -14,12 +14,12 @@ class TransactionController extends Controller
 {
     public function index()
     {
-        return Transaction::all();
+        return Transaction::orderBy('transaction_id','desc')->get();
     }
 
     public function fetchAllUserTransactions()
     {
-        return Transaction::where('user_id',Auth::user()->user_id)->get();
+        return Transaction::where('user_id',Auth::user()->user_id)->orderBy('transaction_id','desc')->get();
     }
     public function store($remarks ,Request $request)
     {

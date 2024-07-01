@@ -183,7 +183,6 @@ export default {
       err: [],
       data: [],
       headers: [
-        { title: "ID", align: "center", key: "transaction_id" },
         { title: "Remarks", align: "center", key: "remarks" },
         { title: "Time", align: "center", key: "created_at" },
         { title: "Actions", align: "center", key: "actions" },

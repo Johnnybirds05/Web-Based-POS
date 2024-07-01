@@ -34,7 +34,7 @@ class ReportsController extends Controller
                 SUM(trans.total_sales) as total_sales,
                 SUM(trans.total_sales_price) as total_sales_price,
                 SUM(trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted)) as descrepancy_kg,
-                SUM((trans.total_quantity - (trans.closing + trans.total_sales+trans.total_wasted)) * products.retail_price) as descrepancy
+                SUM((trans.total_quantity - (trans.closing + trans.total_sales+trans.total_wasted)) * products.original_price) as descrepancy
             '))
             ->join(DB::raw('(SELECT product_id,
                                 (SUM(CASE WHEN remarks = 1 THEN quantity ELSE 0 END) + SUM(CASE WHEN remarks = 3 THEN quantity ELSE 0 END) + SUM(CASE WHEN remarks = 4 THEN quantity ELSE 0 END)) as total_quantity,
@@ -76,7 +76,7 @@ class ReportsController extends Controller
                 SUM(trans.total_sales) as total_sales,
                 SUM(trans.total_sales_price) as total_sales_price,
                 SUM(trans.total_quantity - (trans.closing + trans.total_sales + trans.total_wasted)) as descrepancy_kg,
-                SUM((trans.total_quantity - (trans.closing + trans.total_sales + trans.total_wasted)) * products.retail_price) as descrepancy
+                SUM((trans.total_quantity - (trans.closing + trans.total_sales + trans.total_wasted)) * products.original_price) as descrepancy
             '))
             ->join(DB::raw('(SELECT product_id,
                                 (SUM(CASE WHEN remarks = 1 THEN quantity ELSE 0 END) + SUM(CASE WHEN remarks = 3 THEN quantity ELSE 0 END)+ SUM(CASE WHEN remarks = 4 THEN quantity ELSE 0 END)) as total_quantity,
@@ -123,7 +123,7 @@ class ReportsController extends Controller
                 SUM(trans.total_sales) as total_sales,
                 SUM(trans.total_sales_price) as total_sales_price,
                 SUM(trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted )) as descrepancy_kg,
-                SUM((trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted )) * products.retail_price) as descrepancy
+                SUM((trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted )) * products.original_price) as descrepancy
             '))
             ->join(DB::raw('(SELECT product_id,
                                 (SUM(CASE WHEN remarks = 1 THEN quantity ELSE 0 END) + SUM(CASE WHEN remarks = 3 THEN quantity ELSE 0 END)+ SUM(CASE WHEN remarks = 4 THEN quantity ELSE 0 END)) as total_quantity,
@@ -175,7 +175,7 @@ class ReportsController extends Controller
                 SUM(trans.total_sales) as total_sales,
                 SUM(trans.total_sales_price) as total_sales_price,
                 SUM(trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted)) as descrepancy_kg,
-                SUM((trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted)) * products.retail_price) as descrepancy
+                SUM((trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted)) * products.original_price) as descrepancy
             '))
             ->join(DB::raw('(SELECT product_id,
                                 (SUM(CASE WHEN remarks = 1 THEN quantity ELSE 0 END) + SUM(CASE WHEN remarks = 3 THEN quantity ELSE 0 END)+ SUM(CASE WHEN remarks = 4 THEN quantity ELSE 0 END)) as total_quantity,
@@ -228,7 +228,7 @@ class ReportsController extends Controller
                 SUM(trans.total_sales) as total_sales,
                 SUM(trans.total_sales_price) as total_sales_price,
                 SUM(trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted)) as descrepancy_kg,
-                SUM((trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted)) * products.retail_price) as descrepancy
+                SUM((trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted)) * products.original_price) as descrepancy
             '))
             ->join(DB::raw('(SELECT product_id,
                                 (SUM(CASE WHEN remarks = 1 THEN quantity ELSE 0 END) + SUM(CASE WHEN remarks = 3 THEN quantity ELSE 0 END)+ SUM(CASE WHEN remarks = 4 THEN quantity ELSE 0 END)) as total_quantity,
@@ -279,7 +279,7 @@ class ReportsController extends Controller
                 SUM(trans.total_sales) as total_sales,
                 SUM(trans.total_sales_price) as total_sales_price,
                 SUM(trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted)) as descrepancy_kg,
-                SUM((trans.total_quantity - (trans.closing + trans.total_sales+trans.total_wasted)) * products.retail_price) as descrepancy
+                SUM((trans.total_quantity - (trans.closing + trans.total_sales+trans.total_wasted)) * products.original_price) as descrepancy
             '))
             ->join(DB::raw('(SELECT product_id,
                                 (SUM(CASE WHEN remarks = 1 THEN quantity ELSE 0 END) + SUM(CASE WHEN remarks = 3 THEN quantity ELSE 0 END)+ SUM(CASE WHEN remarks = 4 THEN quantity ELSE 0 END)) as total_quantity,
@@ -328,7 +328,7 @@ class ReportsController extends Controller
                 SUM(trans.total_sales) as total_sales,
                 SUM(trans.total_sales_price) as total_sales_price,
                 SUM(trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted)) as descrepancy_kg,
-                SUM((trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted)) * products.retail_price) as descrepancy
+                SUM((trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted)) * products.original_price) as descrepancy
             '))
             ->join(DB::raw('(SELECT product_id,
                                 (SUM(CASE WHEN remarks = 1 THEN quantity ELSE 0 END) + SUM(CASE WHEN remarks = 3 THEN quantity ELSE 0 END)+ SUM(CASE WHEN remarks = 4 THEN quantity ELSE 0 END)) as total_quantity,
@@ -380,7 +380,7 @@ class ReportsController extends Controller
                 SUM(trans.total_sales) as total_sales,
                 SUM(trans.total_sales_price) as total_sales_price,
                 SUM(trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted)) as descrepancy_kg,
-                SUM((trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted)) * products.retail_price) as descrepancy
+                SUM((trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted)) * products.original_price) as descrepancy
             '))
             ->join(DB::raw('(SELECT product_id,
                                 (SUM(CASE WHEN remarks = 1 THEN quantity ELSE 0 END) + SUM(CASE WHEN remarks = 3 THEN quantity ELSE 0 END)+ SUM(CASE WHEN remarks = 4 THEN quantity ELSE 0 END)) as total_quantity,
@@ -436,7 +436,7 @@ class ReportsController extends Controller
                 SUM(trans.total_sales) as total_sales,
                 SUM(trans.total_sales_price) as total_sales_price,
                 SUM(trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted)) as descrepancy_kg,
-                SUM((trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted)) * products.retail_price) as descrepancy
+                SUM((trans.total_quantity - (trans.closing + trans.total_sales +trans.total_wasted)) * products.original_price) as descrepancy
             '))
             ->join(DB::raw('(SELECT product_id,
                                 (SUM(CASE WHEN remarks = 1 THEN quantity ELSE 0 END) + SUM(CASE WHEN remarks = 3 THEN quantity ELSE 0 END)+ SUM(CASE WHEN remarks = 4 THEN quantity ELSE 0 END)) as total_quantity,
